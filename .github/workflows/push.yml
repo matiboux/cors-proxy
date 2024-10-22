@@ -1,0 +1,93 @@
+name: Push Docker CD
+
+on:
+
+  # Run on push events on primary branches
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/push.yml'
+      - 'app/**'
+      - 'docker-compose.yml'
+
+  # Run on manual triggers
+  workflow_dispatch:
+
+# Set GITHUB_TOKEN permissions for the workflow
+permissions:
+  contents: read
+
+# Allow one concurrent deployment
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Set environment variables for the workflow
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+
+  # Push Docker job
+  push:
+    name: Push Docker
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set IMAGES_PREFIX environment variable
+        env:
+          REGISTRY: ${{ env.REGISTRY }}
+          NAMESPACE: ${{ github.repository_owner }}
+          IMAGES_NAME: ${{ github.event.repository.name }}
+        run: |
+          # Convert variables to lowercase
+          REGISTRY="$(echo "${REGISTRY}" | tr '[:upper:]' '[:lower:]')"
+          NAMESPACE="$(echo "${NAMESPACE}" | tr '[:upper:]' '[:lower:]')"
+          IMAGES_NAME="$(echo "${IMAGES_NAME}" | tr '[:upper:]' '[:lower:]')"
+
+          # Set IMAGES_PREFIX environment variable
+          echo 'IMAGES_PREFIX<<DOCKER_ENV_EOF' >> $GITHUB_ENV
+          echo "${REGISTRY}/${NAMESPACE}/${IMAGES_NAME}" >> $GITHUB_ENV
+          echo 'DOCKER_ENV_EOF' >> $GITHUB_ENV
+
+      - name: Login to Docker registry (GitHub Container Registry)
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull latest Docker images for build cache
+        env:
+          IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
+        run: docker compose -f docker-compose.yml pull --ignore-pull-failures
+
+      - name: Build Docker images for main branch (tag 'latest')
+        if: github.ref == 'refs/heads/main' # Only run on main branch
+        env:
+          IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
+        run: docker compose -f docker-compose.yml build
+
+      - name: Push Docker images for main branch (tag 'latest')
+        if: github.ref == 'refs/heads/main' # Only run on main branch
+        env:
+          IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
+        run: docker compose -f docker-compose.yml push
+
+      - name: Build Ingestion docker image for current commit (tag commit SHA)
+        env:
+          IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
+          IMAGES_TAG: ${{ github.sha }}
+        run: docker compose -f docker-compose.yml build
+
+      - name: Push Ingestion docker image for current commit (tag commit SHA)
+        env:
+          IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
+          IMAGES_TAG: ${{ github.sha }}
+        run: docker compose -f docker-compose.yml push
