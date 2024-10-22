@@ -1,0 +1,11 @@
+# Services definition for building & deploying
+
+services:
+
+  docs:
+    # Build
+    image: ${IMAGES_PREFIX:-app}-docs:${DOCKER_TAG:-latest}
+    build:
+      context: ./docs
+      dockerfile: ./Dockerfile
+      target: app_prod
