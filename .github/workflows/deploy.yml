@@ -2,7 +2,7 @@ name: Deploy Docs CD
 
 on:
 
-  # Run on push events on primary branches
+  # Run on push on primary branches
   push:
     branches:
       - main
