@@ -59,6 +59,7 @@ func handleProxy(w http.ResponseWriter, req *http.Request) {
         // Target URL not specified
         // Redirect to https://example.com
         http.Redirect(w, req, "https://example.com", http.StatusFound)
+        log.Println("Redirect to https://example.com")
         return
     }
 
@@ -66,8 +67,9 @@ func handleProxy(w http.ResponseWriter, req *http.Request) {
     targetURL, err := url.QueryUnescape(pathParts[1])
     if err != nil {
         http.Error(w, "Invalid target URL", http.StatusBadRequest)
+        log.Printf("Invalid target URL: %v\n", err)
         return
-	}
+    }
 
     // Remove trailing slash from target URL
     if strings.HasSuffix(targetURL, "/") {
@@ -83,7 +85,8 @@ func handleProxy(w http.ResponseWriter, req *http.Request) {
     // Parse the target URL
     parsedURL, err := url.Parse(targetURL + targetPath)
     if err != nil {
-        http.Error(w, "Invalid target URL", http.StatusBadRequest)
+        http.Error(w, "Invalid target URL", http.StatusInternalServerError)
+        log.Printf("Invalid target URL: %v\n", err)
         return
     }
 
@@ -98,6 +101,7 @@ func handleProxy(w http.ResponseWriter, req *http.Request) {
     targetReq, err := http.NewRequest(req.Method, parsedURL.String(), req.Body)
     if err != nil {
         http.Error(w, "Failed to create request", http.StatusInternalServerError)
+        log.Printf("Failed to create request: %v\n", err)
         return
     }
 
@@ -113,9 +117,13 @@ func handleProxy(w http.ResponseWriter, req *http.Request) {
     resp, err := client.Do(targetReq)
     if err != nil {
         http.Error(w, "Failed to perform request", http.StatusInternalServerError)
+        log.Printf("Failed to perform request: %v\n", err)
         return
     }
     defer resp.Body.Close()
+
+    // Log the proxied request
+    log.Printf("Proxied request to %s (%d)\n", parsedURL.String(), resp.StatusCode)
 
     // Copy response headers and status code
     for key, values := range resp.Header {
