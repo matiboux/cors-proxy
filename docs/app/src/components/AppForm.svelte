@@ -14,13 +14,13 @@ export {
 import { i18nFactory } from '~/i18n'
 const _ = i18nFactory(locale as any)
 
-const defaultProxyUrl: string = 'http://localhost'
-const defaultServiceUrl: string = 'http://localhost:8080'
-const defaultServicePath: string = '/api/v1'
+const placeholderProxyUrl: string = 'http://localhost'
+const placeholderServiceUrl: string = 'http://api.example.com'
+const placeholderServicePath: string = '/api/v1'
 
-let proxyUrl: string = defaultProxyUrl
-let serviceUrl: string = defaultServiceUrl
-let servicePath: string = defaultServicePath
+let proxyUrl: string = placeholderProxyUrl
+let serviceUrl: string = ''
+let servicePath: string = ''
 
 let outputUrl: string = ''
 let outputValueElement = null
@@ -115,7 +115,7 @@ function onChange()
 			<div class="h-8 sm:h-12">
 				<input
 					class="form-textarea bg-gray-100 block w-full h-full p-2 rounded-md flex-1 resize-none outline-gray-500"
-					placeholder={defaultProxyUrl}
+					placeholder={placeholderProxyUrl}
 					bind:value={proxyUrl}
 					on:input|preventDefault={onInput}
 					on:change|preventDefault={onChange}
@@ -130,7 +130,7 @@ function onChange()
 			<div class="h-8 sm:h-12">
 				<input
 					class="form-textarea bg-gray-100 block w-full h-full p-2 rounded-md flex-1 resize-none outline-gray-500"
-					placeholder={defaultServiceUrl}
+					placeholder={placeholderServiceUrl}
 					bind:value={serviceUrl}
 					on:input|preventDefault={onInput}
 					on:change|preventDefault={onChange}
@@ -145,7 +145,7 @@ function onChange()
 			<div class="h-8 sm:h-12">
 				<input
 					class="form-textarea bg-gray-100 block w-full h-full p-2 rounded-md flex-1 resize-none outline-gray-500"
-					placeholder={defaultServicePath}
+					placeholder={placeholderServicePath}
 					bind:value={servicePath}
 					on:input|preventDefault={onInput}
 					on:change|preventDefault={onChange}
