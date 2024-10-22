@@ -8,10 +8,10 @@ import (
     "strings"
 )
 
-func handleProxy(w http.ResponseWriter, r *http.Request) {
+func handleProxy(w http.ResponseWriter, req *http.Request) {
     // Extract the first raw path argument as the target URL
     // Format: ^()/(targetURL)/(.*)$
-    pathParts := strings.SplitN(r.URL.RawPath, "/", 3)
+    pathParts := strings.SplitN(req.URL.RawPath, "/", 3)
 
     if len(pathParts) < 2 || pathParts[1] == "" {
         http.Error(w, "Target URL not specified", http.StatusNotFound)
@@ -43,23 +43,23 @@ func handleProxy(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Create a new request based on the incoming request
-    proxyReq, err := http.NewRequest(r.Method, parsedURL.String(), r.Body)
+    // Create target request based on incoming request
+    targetReq, err := http.NewRequest(req.Method, parsedURL.String(), req.Body)
     if err != nil {
         http.Error(w, "Failed to create request", http.StatusInternalServerError)
         return
     }
 
-    // Copy headers from the original request
-    for key, values := range r.Header {
+    // Copy incoming headers into target request
+    for key, values := range req.Header {
         for _, value := range values {
-            proxyReq.Header.Add(key, value)
+            targetReq.Header.Add(key, value)
         }
     }
 
-    // Perform the request
+    // Perform the target request
     client := &http.Client{}
-    resp, err := client.Do(proxyReq)
+    resp, err := client.Do(targetReq)
     if err != nil {
         http.Error(w, "Failed to perform request", http.StatusInternalServerError)
         return
