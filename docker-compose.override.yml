@@ -14,7 +14,7 @@ services:
         - action: rebuild
           path: ./app/Dockerfile
         # App source files
-        - action: sync
+        - action: sync+restart
           path: ./app/app
           target: /app
           ignore:
