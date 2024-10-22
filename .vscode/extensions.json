@@ -1,5 +1,7 @@
 {
 	"recommendations": [
-		"golang.go"
+		"astro-build.astro-vscode",
+		"golang.go",
+		"svelte.svelte-vscode"
 	]
 }
