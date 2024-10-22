@@ -19,7 +19,7 @@ on:
 permissions:
   contents: read
 
-# Allow one concurrent deployment
+# Set workflow concurrency rules
 concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: true
@@ -34,25 +34,25 @@ jobs:
 
     steps:
 
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Build application files
-      env:
-        GITHUB_REPOSITORY_URL: https://github.com/${{ github.repository }}
-        GITHUB_SHA: ${{ github.sha }}
-      run: docker compose -f docker-compose-docs.yml -f docker-compose-docs.cicd.yml build --with-dependencies docs
+      - name: Build application files
+        env:
+          GITHUB_REPOSITORY_URL: https://github.com/${{ github.repository }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: docker compose -f docker-compose-docs.yml -f docker-compose-docs.cicd.yml build --with-dependencies docs
 
-    - name: Copy application files
-      run: docker compose -f docker-compose-docs.yml -f docker-compose-docs.cicd.yml run --rm docs
+      - name: Copy application files
+        run: docker compose -f docker-compose-docs.yml -f docker-compose-docs.cicd.yml run --rm docs
 
-    - name: Chown dist folder to $USER
-      run: sudo chown -R $USER:$USER ./docs/dist
+      - name: Chown dist folder to $USER
+        run: sudo chown -R $USER:$USER ./docs/dist
 
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: ./docs/dist
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./docs/dist
 
   # Deploy Docs job
   deploy:
@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
-    # Dependencies
+    # Job dependencies
     needs:
       - build
 
@@ -76,6 +76,6 @@ jobs:
 
     steps:
 
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
