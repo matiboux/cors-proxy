@@ -1,0 +1,37 @@
+name: Check Docs CI
+
+on:
+  # Run on pull requests events on primary branches
+  pull_request:
+    branches:
+      - main
+      - dev
+    paths:
+      - 'docs/**'
+
+# Set GITHUB_TOKEN permissions
+permissions:
+  contents: read
+
+# Allow one concurrent deployment
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  # Build Docs job
+  build:
+    name: Build Docs
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Build application files
+      env:
+        GITHUB_REPOSITORY_URL: https://github.com/${{ github.repository }}
+        GITHUB_SHA: ${{ github.sha }}
+      run: docker compose -f docker-compose-docs.yml -f docker-compose-docs.cicd.yml build
