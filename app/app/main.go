@@ -5,15 +5,30 @@ import (
     "log"
     "net/http"
     "net/url"
+    "strings"
 )
 
 func handleProxy(w http.ResponseWriter, r *http.Request) {
-    targetURL := "http://example.com" // Replace with the target URL
+    // Extract the first path argument as the target URL
+    // Format: ^()/(targetURL)/(.*)$
+    pathParts := strings.SplitN(r.URL.Path, "/", 3)
+
+    if len(pathParts) < 2 || pathParts[1] == "" {
+        http.Error(w, "Target URL not specified", http.StatusNotFound)
+        return
+    }
+
+    // URL decode the target URL
+    targetURL, err := url.QueryUnescape(pathParts[1])
+    if err != nil {
+        http.Error(w, "Invalid target URL", http.StatusBadRequest)
+        return
+	}
 
     // Parse the target URL
     parsedURL, err := url.Parse(targetURL)
     if err != nil {
-        http.Error(w, "Invalid target URL", http.StatusInternalServerError)
+        http.Error(w, "Invalid target URL", http.StatusBadRequest)
         return
     }
 
