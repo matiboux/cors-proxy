@@ -1,6 +1,7 @@
 package main
 
 import (
+    "os"
     "io"
     "log"
     "net/http"
@@ -81,7 +82,13 @@ func handleProxy(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
+    // Read the PORT environment variable
+    port := os.Getenv("PORT")
+    if port == "" {
+        port = "8080" // Default to port 8080
+    }
+
     http.HandleFunc("/", handleProxy)
-    log.Println("Starting proxy server on :8080")
-    log.Fatal(http.ListenAndServe(":8080", nil))
+    log.Println("Starting proxy server on :" + port)
+    log.Fatal(http.ListenAndServe(":" + port, nil))
 }
