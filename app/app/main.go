@@ -14,7 +14,9 @@ func handleProxy(w http.ResponseWriter, req *http.Request) {
     pathParts := strings.SplitN(req.URL.RawPath, "/", 3)
 
     if len(pathParts) < 2 || pathParts[1] == "" {
-        http.Error(w, "Target URL not specified", http.StatusNotFound)
+        // Target URL not specified
+        // Redirect to https://example.com
+        http.Redirect(w, req, "https://example.com", http.StatusFound)
         return
     }
 
