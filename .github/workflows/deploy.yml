@@ -41,10 +41,10 @@ jobs:
       env:
         GITHUB_REPOSITORY_URL: https://github.com/${{ github.repository }}
         GITHUB_SHA: ${{ github.sha }}
-      run: docker compose -f docker-compose-docs.yml -f docker-compose-docs.cicd.yml build
+      run: docker compose -f docker-compose-docs.yml -f docker-compose-docs.cicd.yml build --with-dependencies docs
 
     - name: Copy application files
-      run: docker compose -f docker-compose-docs.yml -f docker-compose-docs.cicd.yml run --rm app
+      run: docker compose -f docker-compose-docs.yml -f docker-compose-docs.cicd.yml run --rm docs
 
     - name: Chown dist folder to $USER
       run: sudo chown -R $USER:$USER ./app/dist
