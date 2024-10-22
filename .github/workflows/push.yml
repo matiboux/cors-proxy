@@ -11,9 +11,6 @@ on:
       - 'app/**'
       - 'docker-compose.yml'
 
-  # (Dev) Run on pull requests
-  pull_request:
-
   # Run on manual triggers
   workflow_dispatch:
 
