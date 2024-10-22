@@ -31,7 +31,7 @@ COPY --link ./app .
 
 
 # --
-# Test image
+# Dev image
 
 FROM app_runtime_base AS app_dev
 
@@ -41,3 +41,9 @@ ENV PORT=${PORT}
 EXPOSE ${PORT}
 
 CMD [ "go", "run", "main.go" ]
+
+
+# --
+# Prod image
+
+FROM app_dev AS app_prod

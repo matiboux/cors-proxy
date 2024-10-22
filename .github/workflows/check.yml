@@ -1,19 +1,26 @@
 name: Check Docs CI
 
 on:
-  # Run on pull requests events on primary branches
+
+  # Run on pull requests to primary branches
   pull_request:
     branches:
       - main
       - dev
     paths:
+      - '.github/workflows/check.yml'
       - 'docs/**'
+      - 'docker-compose-docs.yml'
+      - 'docker-compose-docs.cicd.yml'
 
-# Set GITHUB_TOKEN permissions
+  # Run on manual triggers
+  workflow_dispatch:
+
+# Set GITHUB_TOKEN permissions for the workflow
 permissions:
   contents: read
 
-# Allow one concurrent deployment
+# Set workflow concurrency rules
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
@@ -27,11 +34,12 @@ jobs:
     timeout-minutes: 10
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
 
-    - name: Build application files
-      env:
-        GITHUB_REPOSITORY_URL: https://github.com/${{ github.repository }}
-        GITHUB_SHA: ${{ github.sha }}
-      run: docker compose -f docker-compose-docs.yml -f docker-compose-docs.cicd.yml build
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build application files
+        env:
+          GITHUB_REPOSITORY_URL: https://github.com/${{ github.repository }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: docker compose -f docker-compose-docs.yml -f docker-compose-docs.cicd.yml build
