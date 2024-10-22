@@ -9,9 +9,9 @@ import (
 )
 
 func handleProxy(w http.ResponseWriter, r *http.Request) {
-    // Extract the first path argument as the target URL
+    // Extract the first raw path argument as the target URL
     // Format: ^()/(targetURL)/(.*)$
-    pathParts := strings.SplitN(r.URL.Path, "/", 3)
+    pathParts := strings.SplitN(r.URL.RawPath, "/", 3)
 
     if len(pathParts) < 2 || pathParts[1] == "" {
         http.Error(w, "Target URL not specified", http.StatusNotFound)
