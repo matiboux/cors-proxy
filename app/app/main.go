@@ -18,15 +18,26 @@ func handleProxy(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // URL decode the target URL
+    // Decode the target URL
     targetURL, err := url.QueryUnescape(pathParts[1])
     if err != nil {
         http.Error(w, "Invalid target URL", http.StatusBadRequest)
         return
 	}
 
+    // Remove trailing slash from target URL
+    if strings.HasSuffix(targetURL, "/") {
+        targetURL = targetURL[:len(targetURL)-1]
+    }
+
+    // Set the target path
+    targetPath := "/"
+    if len(pathParts) > 2 {
+        targetPath += pathParts[2]
+    }
+
     // Parse the target URL
-    parsedURL, err := url.Parse(targetURL)
+    parsedURL, err := url.Parse(targetURL + targetPath)
     if err != nil {
         http.Error(w, "Invalid target URL", http.StatusBadRequest)
         return
