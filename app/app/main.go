@@ -9,6 +9,13 @@ import (
     "strings"
 )
 
+func overrideCORSHeaders(w http.ResponseWriter) {
+    // Allow CORS from all origins, methods, and headers
+    w.Header().Set("Access-Control-Allow-Origin", "*")
+    w.Header().Set("Access-Control-Allow-Methods", "*")
+    w.Header().Set("Access-Control-Allow-Headers", "*")
+}
+
 func handleProxy(w http.ResponseWriter, req *http.Request) {
     // Extract the first raw path argument as the target URL
     // Format: ^()/(targetURL)/(.*)$
@@ -46,6 +53,13 @@ func handleProxy(w http.ResponseWriter, req *http.Request) {
         return
     }
 
+    // Handle CORS preflight requests
+    if req.Method == http.MethodOptions {
+        overrideCORSHeaders(w)
+        w.WriteHeader(http.StatusOK)
+        return
+    }
+
     // Create target request based on incoming request
     targetReq, err := http.NewRequest(req.Method, parsedURL.String(), req.Body)
     if err != nil {
@@ -75,6 +89,10 @@ func handleProxy(w http.ResponseWriter, req *http.Request) {
             w.Header().Add(key, value)
         }
     }
+
+    // Override CORS headers
+    overrideCORSHeaders(w)
+
     w.WriteHeader(resp.StatusCode)
 
     // Copy response body
