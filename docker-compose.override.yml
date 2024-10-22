@@ -8,6 +8,8 @@ services:
     build:
       target: app_dev
     # Deploy override
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     develop:
       watch:
         # Docker image
