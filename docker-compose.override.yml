@@ -2,7 +2,7 @@
 
 services:
 
-  app:
+  proxy:
     # Build override
     image: ${IMAGES_PREFIX:-app}-dev:${IMAGES_TAG:-latest}
     build:
@@ -14,10 +14,10 @@ services:
       watch:
         # Docker image
         - action: rebuild
-          path: ./app/Dockerfile
+          path: ./proxy/Dockerfile
         # App source files
         - action: sync+restart
-          path: ./app/app
+          path: ./proxy/app
           target: /app
           ignore:
             - node_modules/

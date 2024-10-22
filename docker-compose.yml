@@ -2,11 +2,11 @@
 
 services:
 
-  app:
+  proxy:
     # Build
     image: ${IMAGES_PREFIX:-app}:${IMAGES_TAG:-latest}
     build:
-      context: ./app
+      context: ./proxy
       dockerfile: ./Dockerfile
       target: app_prod
       args:
