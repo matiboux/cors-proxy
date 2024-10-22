@@ -57,9 +57,9 @@ func handleProxy(w http.ResponseWriter, req *http.Request) {
 
 	if len(pathParts) < 2 || pathParts[1] == "" {
 		// Target URL not specified
-		// Redirect to https://example.com
-		http.Redirect(w, req, "https://example.com", http.StatusFound)
-		log.Println("Redirect to https://example.com")
+		// Redirect to project website
+		http.Redirect(w, req, "https://cors-proxy.matiboux.com", http.StatusFound)
+		log.Println("Redirect to https://cors-proxy.matiboux.com")
 		return
 	}
 

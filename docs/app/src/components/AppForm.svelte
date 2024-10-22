@@ -14,13 +14,13 @@ export {
 import { i18nFactory } from '~/i18n'
 const _ = i18nFactory(locale as any)
 
-const defaultProxyUrl: string = 'http://localhost'
-const defaultServiceUrl: string = 'http://localhost:8080'
-const defaultServicePath: string = '/api/v1'
+const placeholderProxyUrl: string = 'http://localhost'
+const placeholderServiceUrl: string = 'http://api.example.com'
+const placeholderServicePath: string = '/api/v1'
 
-let proxyUrl: string = defaultProxyUrl
-let serviceUrl: string = defaultServiceUrl
-let servicePath: string = defaultServicePath
+let proxyUrl: string = placeholderProxyUrl
+let serviceUrl: string = ''
+let servicePath: string = ''
 
 let outputUrl: string = ''
 let outputValueElement = null
@@ -105,6 +105,29 @@ function onChange()
 	style={style}
 >
 
+	<!-- Setup group -->
+	<div class="p-4 space-y-4 col-span-2 sm:col-auto border border-gray-200 rounded-md">
+
+		<label class="block space-y-2 flex flex-col">
+			<span class="text-gray-700">
+				{_('Start the CORS Proxy server locally:')}
+			</span>
+			<div class="h-8 sm:h-12">
+				<input
+					class="form-textarea bg-gray-100 block w-full h-full p-2 rounded-md flex-1 resize-none outline-gray-500"
+					value="docker run -p 80:8080 ghcr.io/matiboux/cors-proxy"
+					disabled
+				/>
+			</div>
+		</label>
+
+	</div>
+
+	<!-- Step separator -->
+	<div class="pl-2 text-xl text-gray-600">
+		<span class="icon-[mdi--plus] align-icon-inline"></span>
+	</div>
+
 	<!-- Input group -->
 	<div class="p-4 space-y-4 col-span-2 sm:col-auto border border-gray-200 rounded-md">
 
@@ -115,7 +138,7 @@ function onChange()
 			<div class="h-8 sm:h-12">
 				<input
 					class="form-textarea bg-gray-100 block w-full h-full p-2 rounded-md flex-1 resize-none outline-gray-500"
-					placeholder={defaultProxyUrl}
+					placeholder={placeholderProxyUrl}
 					bind:value={proxyUrl}
 					on:input|preventDefault={onInput}
 					on:change|preventDefault={onChange}
@@ -130,7 +153,7 @@ function onChange()
 			<div class="h-8 sm:h-12">
 				<input
 					class="form-textarea bg-gray-100 block w-full h-full p-2 rounded-md flex-1 resize-none outline-gray-500"
-					placeholder={defaultServiceUrl}
+					placeholder={placeholderServiceUrl}
 					bind:value={serviceUrl}
 					on:input|preventDefault={onInput}
 					on:change|preventDefault={onChange}
@@ -145,7 +168,7 @@ function onChange()
 			<div class="h-8 sm:h-12">
 				<input
 					class="form-textarea bg-gray-100 block w-full h-full p-2 rounded-md flex-1 resize-none outline-gray-500"
-					placeholder={defaultServicePath}
+					placeholder={placeholderServicePath}
 					bind:value={servicePath}
 					on:input|preventDefault={onInput}
 					on:change|preventDefault={onChange}
