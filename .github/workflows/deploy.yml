@@ -47,12 +47,12 @@ jobs:
       run: docker compose -f docker-compose-docs.yml -f docker-compose-docs.cicd.yml run --rm docs
 
     - name: Chown dist folder to $USER
-      run: sudo chown -R $USER:$USER ./app/dist
+      run: sudo chown -R $USER:$USER ./docs/dist
 
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        path: ./app/dist
+        path: ./docs/dist
 
   # Deploy Docs job
   deploy:
