@@ -9,11 +9,45 @@ import (
     "strings"
 )
 
-func overrideCORSHeaders(w http.ResponseWriter) {
-    // Allow CORS from all origins, methods, and headers
+func overrideCORSHeaders(w http.ResponseWriter, req *http.Request) {
+    // Set allowed origins for CORS
+    origin := req.Header.Get("Access-Control-Allow-Origin")
+    if origin == "" {
+        origin = "*" // Default to allow all origins
+    }
     w.Header().Set("Access-Control-Allow-Origin", "*")
+
+    // Set allowed methods for CORS
+    methods := req.Header.Get("Access-Control-Allow-Methods")
+    if methods == "" {
+        methods = "*" // Default to allow all methods
+    }
     w.Header().Set("Access-Control-Allow-Methods", "*")
+
+    // Set allowed headers for CORS
+    headers := req.Header.Get("Access-Control-Allow-Headers")
+    if headers == "" {
+        headers = "*" // Default to allow all headers
+    }
     w.Header().Set("Access-Control-Allow-Headers", "*")
+
+    // Set allowed credentials for CORS
+    credentials := req.Header.Get("Access-Control-Allow-Credentials")
+    if credentials != "" {
+        w.Header().Set("Access-Control-Allow-Credentials", credentials)
+    }
+
+    // Set max age for CORS
+    maxAge := req.Header.Get("Access-Control-Max-Age")
+    if maxAge != "" {
+        w.Header().Set("Access-Control-Max-Age", maxAge)
+    }
+
+    // Set exposed headers for CORS
+    jsHeaders := req.Header.Get("Access-Control-Expose-Headers")
+    if jsHeaders != "" {
+        w.Header().Set("Access-Control-Expose-Headers", jsHeaders)
+    }
 }
 
 func handleProxy(w http.ResponseWriter, req *http.Request) {
@@ -55,7 +89,7 @@ func handleProxy(w http.ResponseWriter, req *http.Request) {
 
     // Handle CORS preflight requests
     if req.Method == http.MethodOptions {
-        overrideCORSHeaders(w)
+        overrideCORSHeaders(w, req)
         w.WriteHeader(http.StatusOK)
         return
     }
@@ -91,7 +125,7 @@ func handleProxy(w http.ResponseWriter, req *http.Request) {
     }
 
     // Override CORS headers
-    overrideCORSHeaders(w)
+    overrideCORSHeaders(w, req)
 
     w.WriteHeader(resp.StatusCode)
 
