@@ -1,0 +1,81 @@
+name: Deploy Docs CD
+
+on:
+
+  # Run on push events on primary branches
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/deploy.yml'
+      - 'app/**'
+      - 'docker-compose.yml'
+      - 'docker-compose.cicd.yml'
+
+  # Run on manual triggers
+  workflow_dispatch:
+
+# Set GITHUB_TOKEN permissions for the workflow
+permissions:
+  contents: read
+
+# Allow one concurrent deployment
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+
+  # Build Docs job
+  build:
+    name: Build Docs
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Build application files
+      env:
+        GITHUB_REPOSITORY_URL: https://github.com/${{ github.repository }}
+        GITHUB_SHA: ${{ github.sha }}
+      run: docker compose -f docker-compose-docs.yml -f docker-compose-docs.cicd.yml build
+
+    - name: Copy application files
+      run: docker compose -f docker-compose-docs.yml -f docker-compose-docs.cicd.yml run --rm app
+
+    - name: Chown dist folder to $USER
+      run: sudo chown -R $USER:$USER ./app/dist
+
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: ./app/dist
+
+  # Deploy Docs job
+  deploy:
+    name: Deploy Docs
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    # Dependencies
+    needs:
+      - build
+
+    # Set GITHUB_TOKEN permissions for the job
+    permissions:
+      pages: write
+      id-token: write
+
+    # Set deployment environment
+    environment:
+      name: production
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
