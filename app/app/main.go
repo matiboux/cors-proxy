@@ -53,7 +53,7 @@ func overrideCORSHeaders(w http.ResponseWriter, req *http.Request) {
 func handleProxy(w http.ResponseWriter, req *http.Request) {
     // Extract the first raw path argument as the target URL
     // Format: ^()/(targetURL)/(.*)$
-    pathParts := strings.SplitN(req.URL.RawPath, "/", 3)
+    pathParts := strings.SplitN(req.URL.EscapedPath(), "/", 3)
 
     if len(pathParts) < 2 || pathParts[1] == "" {
         // Target URL not specified
