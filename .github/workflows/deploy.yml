@@ -8,9 +8,9 @@ on:
       - main
     paths:
       - '.github/workflows/deploy.yml'
-      - 'app/**'
-      - 'docker-compose.yml'
-      - 'docker-compose.cicd.yml'
+      - 'docs/**'
+      - 'docker-compose-docs.yml'
+      - 'docker-compose-docs.cicd.yml'
 
   # Run on manual triggers
   workflow_dispatch:
