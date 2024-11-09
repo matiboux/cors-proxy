@@ -46,4 +46,17 @@ CMD [ "go", "run", "main.go" ]
 # --
 # Prod image
 
-FROM app_dev AS app_prod
+FROM app_runtime_base AS app_prod
+
+# Set runtime environment
+ENV APP_ENV=prod
+
+# Build application
+RUN go build -o main .
+
+# Set exposed port
+ARG PORT=8080
+ENV PORT=${PORT}
+EXPOSE ${PORT}
+
+CMD [ "./main" ]
