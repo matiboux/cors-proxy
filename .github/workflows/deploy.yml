@@ -2,7 +2,7 @@ name: Deploy Docs CD
 
 on:
 
-  # Run on push on primary branches
+  # Run on push on production branches
   push:
     branches:
       - master
@@ -29,7 +29,7 @@ concurrency:
 
 jobs:
 
-  # Build job
+  # Build Docs job
   build:
     name: Build Docs
     runs-on: ubuntu-latest
