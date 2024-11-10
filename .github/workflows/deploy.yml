@@ -28,7 +28,7 @@ concurrency:
 
 jobs:
 
-  # Build Docs job
+  # Build job
   build:
     name: Build Docs
     runs-on: ubuntu-latest
