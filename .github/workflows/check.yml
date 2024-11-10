@@ -44,8 +44,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build application files
+      - name: Build for production
         env:
           GITHUB_REPOSITORY_URL: https://github.com/${{ github.repository }}
           GITHUB_SHA: ${{ github.sha }}
+          BUILD_CHECK: "true" # Run type checks
         run: docker compose -f docker-compose-docs.yml -f docker-compose-docs.cicd.yml build
+
+      - name: Copy application files
+        run: docker compose -f docker-compose.yml -f docker-compose.cicd.yml run --rm app
+
+      - name: Check application files
+        run: |
+          [ -d ./app/dist ] && [ $(ls -1 ./app/dist | wc -l) -gt 0 ] \
+            && echo "Application files found" \
+            || ( echo "No application files found" && exit 1 )
