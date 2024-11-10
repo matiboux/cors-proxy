@@ -5,13 +5,19 @@ on:
   # Run on pull requests to primary branches
   pull_request:
     branches:
+      - master
       - main
+      - prod
+      - production
+      - staging
       - dev
+      - develop
+      - development
+      - test
     paths:
       - '.github/workflows/check.yml'
       - 'docs/**'
-      - 'docker-compose-docs.yml'
-      - 'docker-compose-docs.cicd.yml'
+      - 'docker-compose-docs*.yml'
 
   # Run on manual triggers
   workflow_dispatch:
