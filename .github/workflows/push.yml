@@ -91,11 +91,12 @@ jobs:
         env:
           IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
           IMAGES_TAG: ${{ github.sha }}
-          IMAGES_RETAG: latest
+          NEW_IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
+          NEW_IMAGES_TAG: latest
         run: |
           docker compose -f docker-compose.yml config --images | while read -r IMAGE; do
-            echo "Retag '${IMAGE}' to '${IMAGES_PREFIX}:${IMAGES_RETAG}'"
-            docker tag "${IMAGE}" "${IMAGES_PREFIX}:${IMAGES_RETAG}"
+            echo "Retag '${IMAGE}' to '${NEW_IMAGES_PREFIX}:${NEW_IMAGES_TAG}'"
+            docker tag "${IMAGE}" "${NEW_IMAGES_PREFIX}:${NEW_IMAGES_TAG}"
           done
 
       - name: Push Docker images for main branch (tag 'latest')
