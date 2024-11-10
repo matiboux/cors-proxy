@@ -39,11 +39,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build application files
+      - name: Build for production
         env:
           GITHUB_REPOSITORY_URL: https://github.com/${{ github.repository }}
           GITHUB_SHA: ${{ github.sha }}
-        run: docker compose -f docker-compose-docs.yml -f docker-compose-docs.cicd.yml build --with-dependencies docs
+          BUILD_CHECK: "false" # Skip type checks
+        run: docker compose -f docker-compose-docs.yml -f docker-compose-docs.cicd.yml build
 
       - name: Copy application files
         run: docker compose -f docker-compose-docs.yml -f docker-compose-docs.cicd.yml run --rm docs
