@@ -74,6 +74,18 @@ jobs:
           IMAGES_TAG: latest
         run: docker compose -f docker-compose.yml pull --ignore-pull-failures
 
+      - name: Build Docker images for current commit (tag commit SHA)
+        env:
+          IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
+          IMAGES_TAG: ${{ github.sha }}
+        run: docker compose -f docker-compose.yml build
+
+      - name: Push Docker images for current commit (tag commit SHA)
+        env:
+          IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
+          IMAGES_TAG: ${{ github.sha }}
+        run: docker compose -f docker-compose.yml push
+
       - name: Build Docker images for main branch (tag 'latest')
         if: github.ref == 'refs/heads/main' # Only run on main branch
         env:
@@ -86,16 +98,4 @@ jobs:
         env:
           IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
           IMAGES_TAG: latest
-        run: docker compose -f docker-compose.yml push
-
-      - name: Build Docker images for current commit (tag commit SHA)
-        env:
-          IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
-          IMAGES_TAG: ${{ github.sha }}
-        run: docker compose -f docker-compose.yml build
-
-      - name: Push Docker images for current commit (tag commit SHA)
-        env:
-          IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
-          IMAGES_TAG: ${{ github.sha }}
         run: docker compose -f docker-compose.yml push
