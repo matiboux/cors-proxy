@@ -5,11 +5,14 @@ on:
   # Run on push on primary branches
   push:
     branches:
+      - master
       - main
+      - prod
+      - production
     paths:
       - '.github/workflows/push.yml'
-      - 'app/**'
-      - 'docker-compose.yml'
+      - 'proxy/**'
+      - 'docker-compose*.yml'
 
   # Run on manual triggers
   workflow_dispatch:
@@ -18,7 +21,7 @@ on:
 permissions:
   contents: read
 
-# Allow one concurrent deployment
+# Set workflow concurrency rules
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
