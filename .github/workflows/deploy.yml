@@ -5,12 +5,14 @@ on:
   # Run on push on primary branches
   push:
     branches:
+      - master
       - main
+      - prod
+      - production
     paths:
       - '.github/workflows/deploy.yml'
       - 'docs/**'
-      - 'docker-compose-docs.yml'
-      - 'docker-compose-docs.cicd.yml'
+      - 'docker-compose-docs*.yml'
 
   # Run on manual triggers
   workflow_dispatch:
