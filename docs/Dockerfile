@@ -76,11 +76,6 @@ FROM app_runtime_base AS app_prod_build
 ENV APP_ENV=prod
 ENV NODE_ENV=production
 
-# Install git, used for fetch history in build
-RUN --mount=type=cache,target=/var/cache/apt \
-	apt-get update && \
-	apt-get install -y git
-
 # Use application environment variables
 ARG GITHUB_REPOSITORY_URL=""
 ENV GITHUB_REPOSITORY_URL=${GITHUB_REPOSITORY_URL}
