@@ -52,7 +52,7 @@ jobs:
         run: docker compose -f docker-compose-docs.yml -f docker-compose-docs.cicd.yml build
 
       - name: Copy application files
-        run: docker compose -f docker-compose-docs.yml -f docker-compose-docs.cicd.yml run --rm docs
+        run: docker compose -f docker-compose-docs.yml -f docker-compose-docs.cicd.yml up
 
       - name: Check application files
         run: |
