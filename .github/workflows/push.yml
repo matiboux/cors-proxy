@@ -23,10 +23,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-# Set environment variables for the workflow
-env:
-  REGISTRY: ghcr.io
-
 jobs:
 
   # Push Docker job
@@ -39,6 +35,10 @@ jobs:
     permissions:
       contents: read
       packages: write
+
+    # Set environment variables for the job
+    env:
+      REGISTRY: ghcr.io
 
     # Set outputs
     outputs:
