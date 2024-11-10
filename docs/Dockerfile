@@ -91,6 +91,7 @@ RUN npm run build
 
 FROM nginx_upstream AS app_prod
 
+# Set runtime environment
 ENV APP_ENV=prod
 ENV NODE_ENV=production
 
