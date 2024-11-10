@@ -61,7 +61,7 @@ jobs:
           echo "${REGISTRY}/${NAMESPACE}/${IMAGES_NAME}" >> $GITHUB_ENV
           echo 'DOCKER_ENV_EOF' >> $GITHUB_ENV
 
-      - name: Login to Docker registry (GitHub Container Registry)
+      - name: Login to GitHub Docker registry (GitHub Container Registry)
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
@@ -71,27 +71,30 @@ jobs:
       - name: Pull latest Docker images for build cache
         env:
           IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
+          IMAGES_TAG: latest
         run: docker compose -f docker-compose.yml pull --ignore-pull-failures
 
       - name: Build Docker images for main branch (tag 'latest')
         if: github.ref == 'refs/heads/main' # Only run on main branch
         env:
           IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
+          IMAGES_TAG: latest
         run: docker compose -f docker-compose.yml build
 
       - name: Push Docker images for main branch (tag 'latest')
         if: github.ref == 'refs/heads/main' # Only run on main branch
         env:
           IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
+          IMAGES_TAG: latest
         run: docker compose -f docker-compose.yml push
 
-      - name: Build Ingestion docker image for current commit (tag commit SHA)
+      - name: Build Docker images for current commit (tag commit SHA)
         env:
           IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
           IMAGES_TAG: ${{ github.sha }}
         run: docker compose -f docker-compose.yml build
 
-      - name: Push Ingestion docker image for current commit (tag commit SHA)
+      - name: Push Docker images for current commit (tag commit SHA)
         env:
           IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
           IMAGES_TAG: ${{ github.sha }}
