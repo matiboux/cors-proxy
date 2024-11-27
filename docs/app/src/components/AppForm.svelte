@@ -133,6 +133,8 @@ function onChange()
 				<input
 					class="form-textarea bg-gray-100 block w-16 h-8 p-2 rounded-md flex-1 resize-none outline-gray-500"
 					bind:value={proxyPort}
+					on:input|preventDefault={onInput}
+					on:change|preventDefault={onChange}
 				/>
 			</div>
 			<div class="h-8 sm:h-12">
