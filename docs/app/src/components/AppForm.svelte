@@ -23,8 +23,6 @@ let proxyUrl: string = ''
 let serviceUrl: string = ''
 let servicePath: string = ''
 
-let outputUrl: string = ''
-let outputValueElement = null
 let convertError: string | null = null
 
 let onInputConvertTimeout: NodeJS.Timeout | undefined = undefined
@@ -49,14 +47,18 @@ function defaultProxyUrl(port: string): string
 	return `${placeholderProxyUrl}:${parsedPort}`
 }
 
-function convert()
+function outputUrl(
+	port: string,
+	proxyUrl: string,
+	serviceUrl: string,
+	servicePath: string,
+): string
 {
-	if (onInputConvertTimeout)
+	let newProxyUrl = proxyUrl.trim()
+	if (!newProxyUrl)
 	{
-		clearTimeout(onInputConvertTimeout)
+		newProxyUrl = defaultProxyUrl(proxyPort)
 	}
-
-	let newProxyUrl = proxyUrl ? proxyUrl.trim() : defaultProxyUrl(proxyPort)
 
 	let newServiceUrl = serviceUrl.trim()
 	if (newServiceUrl)
@@ -72,43 +74,14 @@ function convert()
 
 	try
 	{
-		outputUrl = `${newProxyUrl}${newServiceUrl}${newServicePath}`
 		convertError = null
+		return `${newProxyUrl}${newServiceUrl}${newServicePath}`
 	}
 	catch (error: any)
 	{
-		outputUrl = ''
 		convertError = error.message
+		return ''
 	}
-}
-
-onMount(() =>
-	{
-		convert()
-	})
-
-let allowDefaultInputValue: boolean = true
-
-function onInput()
-{
-	if (onInputConvertTimeout)
-	{
-		clearTimeout(onInputConvertTimeout)
-	}
-
-	allowDefaultInputValue = false
-
-	onInputConvertTimeout = setTimeout(() =>
-		{
-			convert()
-		}, 400)
-}
-
-function onChange()
-{
-	allowDefaultInputValue = false
-
-	convert()
 }
 </script>
 
@@ -133,8 +106,6 @@ function onChange()
 				<input
 					class="form-textarea bg-gray-100 block w-16 h-8 p-2 rounded-md flex-1 resize-none outline-gray-500"
 					bind:value={proxyPort}
-					on:input|preventDefault={onInput}
-					on:change|preventDefault={onChange}
 				/>
 			</div>
 			<div class="h-8 sm:h-12">
@@ -165,8 +136,6 @@ function onChange()
 					class="form-textarea bg-gray-100 block w-full h-full p-2 placeholder:text-gray-600 rounded-md flex-1 resize-none outline-gray-500"
 					placeholder={defaultProxyUrl(proxyPort)}
 					bind:value={proxyUrl}
-					on:input|preventDefault={onInput}
-					on:change|preventDefault={onChange}
 				/>
 			</div>
 		</label>
@@ -180,8 +149,6 @@ function onChange()
 					class="form-textarea bg-gray-100 block w-full h-full p-2 placeholder:text-gray-400 rounded-md flex-1 resize-none outline-gray-500"
 					placeholder={placeholderServiceUrl}
 					bind:value={serviceUrl}
-					on:input|preventDefault={onInput}
-					on:change|preventDefault={onChange}
 				/>
 			</div>
 		</label>
@@ -195,8 +162,6 @@ function onChange()
 					class="form-textarea bg-gray-100 block w-full h-full p-2 placeholder:text-gray-400 rounded-md flex-1 resize-none outline-gray-500"
 					placeholder={placeholderServicePath}
 					bind:value={servicePath}
-					on:input|preventDefault={onInput}
-					on:change|preventDefault={onChange}
 				/>
 			</div>
 		</label>
@@ -217,8 +182,7 @@ function onChange()
 				<input
 					class="form-textarea bg-gray-200 block w-full h-full p-2 placeholder:text-gray-400 rounded-md flex-1 resize-none"
 					placeholder="Enter the proxy and service URL"
-					bind:this={outputValueElement}
-					bind:value={outputUrl}
+					value={outputUrl(proxyPort, proxyUrl, serviceUrl, servicePath)}
 					disabled
 				/>
 			</div>
