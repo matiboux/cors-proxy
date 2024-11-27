@@ -10,6 +10,8 @@ const defaultLocale =
 	'Target service URL you want to access via your proxy:',
 	'Target service path of your request (optional):',
 	'Formatted proxy URL pointing to the target service:',
+	'Copy',
+	'Copied!',
 	// Footer
 	'Open source project',
 	'See the source code on {0}',

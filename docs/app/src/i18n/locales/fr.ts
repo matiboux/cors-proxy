@@ -19,6 +19,8 @@ const locale =
 		'Chemin du service cible de votre demande (facultatif) :',
 	'Formatted proxy URL pointing to the target service:':
 		'URL du proxy formatée pointant vers le service cible :',
+	'Copy': 'Copier',
+	'Copied!': 'Copié !',
 	// Footer
 	'Open source project': 'Projet open source',
 	'See the source code on {0}': 'Voir le code source sur {0}',
