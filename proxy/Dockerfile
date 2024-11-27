@@ -7,6 +7,7 @@
 # Upstream images
 
 FROM golang:1.23-alpine AS go_upstream
+FROM alpine:3.20 AS alpine_upstream
 
 
 # --
@@ -44,15 +45,30 @@ CMD [ "go", "run", "main.go" ]
 
 
 # --
-# Prod image
+# Prod build image
 
-FROM app_runtime_base AS app_prod
+FROM app_runtime_base AS app_prod_build
 
 # Set runtime environment
 ENV APP_ENV=prod
 
 # Build application
 RUN go build -o main .
+
+
+# --
+# Prod image
+
+FROM alpine_upstream AS app_prod
+
+# Set app directory
+WORKDIR /app
+
+# Set runtime environment
+ENV APP_ENV=prod
+
+# Copy application binary
+COPY --from=app_prod_build --chmod=755 /app/main ./main
 
 # Set exposed port
 ARG PORT=8080
