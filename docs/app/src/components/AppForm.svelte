@@ -95,7 +95,7 @@ function outputUrl(
 	<!-- Setup group -->
 	<div class="p-4 space-y-4 col-span-2 sm:col-auto border border-gray-200 rounded-md">
 
-		<label class="block space-y-2 flex flex-col">
+		<label class="flex flex-col gap-2">
 			<span class="text-gray-700">
 				{_('Start the CORS Proxy server locally.')}
 			</span>
@@ -127,7 +127,7 @@ function outputUrl(
 	<!-- Input group -->
 	<div class="p-4 space-y-4 col-span-2 sm:col-auto border border-gray-200 rounded-md">
 
-		<label class="block space-y-2 flex flex-col">
+		<label class="flex flex-col gap-2">
 			<span class="text-gray-700">
 				{_('CORS Proxy server URL (leave empty for default):')}
 			</span>
@@ -140,7 +140,7 @@ function outputUrl(
 			</div>
 		</label>
 
-		<label class="block space-y-2 flex flex-col">
+		<label class="flex flex-col gap-2">
 			<span class="text-gray-700">
 				{_('Target service URL you want to access via your proxy:')}
 			</span>
@@ -153,7 +153,7 @@ function outputUrl(
 			</div>
 		</label>
 
-		<label class="block space-y-2 flex flex-col">
+		<label class="flex flex-col gap-2">
 			<span class="text-gray-700">
 				{_('Target service path of your request (optional):')}
 			</span>
@@ -174,7 +174,7 @@ function outputUrl(
 
 	<!-- Output group -->
 	<div class="bg-gray-100 p-4 space-y-4 col-span-2 sm:col-auto border border-gray-300 rounded-md">
-		<label class="block space-y-2 flex flex-col">
+		<label class="flex flex-col gap-2">
 			<span class="text-gray-700">
 				{_('Formatted proxy URL pointing to the target service:')}
 			</span>
