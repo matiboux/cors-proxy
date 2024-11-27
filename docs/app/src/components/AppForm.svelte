@@ -31,7 +31,7 @@ let onInputConvertTimeout: NodeJS.Timeout | undefined = undefined
 
 function parsePort(port: string): number
 {
-	const parsedPort = Number(port)
+	const parsedPort = port ? Number(port) : 80
 	if (!Number.isInteger(parsedPort))
 	{
 		return 80
