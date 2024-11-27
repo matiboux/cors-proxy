@@ -14,35 +14,54 @@ export {
 import { i18nFactory } from '~/i18n'
 const _ = i18nFactory(locale as any)
 
+// Generate a random suffix for id attributes
+const idSuffix = Math.random().toString(36).substring(2)
+
 const placeholderProxyUrl: string = 'http://localhost'
 const placeholderServiceUrl: string = 'http://api.example.com'
 const placeholderServicePath: string = '/api/v1'
 
-let proxyUrl: string = placeholderProxyUrl
+let proxyPort: string = '80'
+let proxyUrl: string = ''
 let serviceUrl: string = ''
 let servicePath: string = ''
 
-let outputUrl: string = ''
-let outputValueElement = null
 let convertError: string | null = null
 
-let onInputConvertTimeout: NodeJS.Timeout | undefined = undefined
+let lastCopiedSelector: string | null = null
 
-function convert()
+function parsePort(port: string): number
 {
-	if (onInputConvertTimeout)
+	const parsedPort = port ? Number(port) : 80
+	if (!Number.isInteger(parsedPort))
 	{
-		clearTimeout(onInputConvertTimeout)
+		return 80
 	}
+	return parsedPort
+}
 
-	if (!proxyUrl)
+function defaultProxyUrl(port: string): string
+{
+	const parsedPort = parsePort(port)
+	if (parsedPort === 80)
 	{
-		outputUrl = ''
-		convertError = null
-		return
+		return placeholderProxyUrl
 	}
+	return `${placeholderProxyUrl}:${parsedPort}`
+}
 
+function outputUrl(
+	port: string,
+	proxyUrl: string,
+	serviceUrl: string,
+	servicePath: string,
+): string
+{
 	let newProxyUrl = proxyUrl.trim()
+	if (!newProxyUrl)
+	{
+		newProxyUrl = defaultProxyUrl(proxyPort)
+	}
 
 	let newServiceUrl = serviceUrl.trim()
 	if (newServiceUrl)
@@ -58,43 +77,24 @@ function convert()
 
 	try
 	{
-		outputUrl = `${newProxyUrl}${newServiceUrl}${newServicePath}`
 		convertError = null
+		return `${newProxyUrl}${newServiceUrl}${newServicePath}`
 	}
 	catch (error: any)
 	{
-		outputUrl = ''
 		convertError = error.message
+		return ''
 	}
 }
 
-onMount(() =>
-	{
-		convert()
-	})
-
-let allowDefaultInputValue: boolean = true
-
-function onInput()
+function copyInputValue(selector: string, event: MouseEvent)
 {
-	if (onInputConvertTimeout)
+	const target = document.getElementById(`input-${selector}-${idSuffix}`) as HTMLInputElement | null
+	if (target)
 	{
-		clearTimeout(onInputConvertTimeout)
+		lastCopiedSelector = selector
+		navigator.clipboard.writeText(target.value)
 	}
-
-	allowDefaultInputValue = false
-
-	onInputConvertTimeout = setTimeout(() =>
-		{
-			convert()
-		}, 400)
-}
-
-function onChange()
-{
-	allowDefaultInputValue = false
-
-	convert()
 }
 </script>
 
@@ -108,14 +108,31 @@ function onChange()
 	<!-- Setup group -->
 	<div class="p-4 space-y-4 col-span-2 sm:col-auto border border-gray-200 rounded-md">
 
-		<label class="block space-y-2 flex flex-col">
+		<label class="flex flex-col gap-2">
 			<span class="text-gray-700">
-				{_('Start the CORS Proxy server locally:')}
+				{_('Start the CORS Proxy server locally.')}
+				<button
+					type="button" class="copy-button" class:copied={lastCopiedSelector === 'proxy'}
+					on:click|preventDefault={copyInputValue.bind(null, 'proxy')}
+				>
+					<span class="icon icon-[mdi--content-copy] icon-align"></span>
+					{lastCopiedSelector === 'proxy' ? _('Copied!') : _('Copy')}
+				</button>
 			</span>
+			<div class="flex gap-2 items-center">
+				<span class="text-gray-700">
+					{_('Run on port:')}
+				</span>
+				<input
+					class="form-textarea bg-gray-100 block w-16 h-8 p-2 rounded-md flex-1 resize-none outline-gray-500"
+					bind:value={proxyPort}
+				/>
+			</div>
 			<div class="h-8 sm:h-12">
 				<input
+					id={`input-proxy-${idSuffix}`}
 					class="form-textarea bg-gray-100 block w-full h-full p-2 rounded-md flex-1 resize-none outline-gray-500"
-					value="docker run -p 80:8080 ghcr.io/matiboux/cors-proxy"
+					value={`docker run -p ${parsePort(proxyPort)}:8080 ghcr.io/matiboux/cors-proxy`}
 					disabled
 				/>
 			</div>
@@ -131,47 +148,41 @@ function onChange()
 	<!-- Input group -->
 	<div class="p-4 space-y-4 col-span-2 sm:col-auto border border-gray-200 rounded-md">
 
-		<label class="block space-y-2 flex flex-col">
+		<label class="flex flex-col gap-2">
 			<span class="text-gray-700">
-				{_('CORS Proxy server URL:')}
+				{_('CORS Proxy server URL (leave empty for default):')}
 			</span>
 			<div class="h-8 sm:h-12">
 				<input
-					class="form-textarea bg-gray-100 block w-full h-full p-2 rounded-md flex-1 resize-none outline-gray-500"
-					placeholder={placeholderProxyUrl}
+					class="form-textarea bg-gray-100 block w-full h-full p-2 placeholder:text-gray-600 rounded-md flex-1 resize-none outline-gray-500"
+					placeholder={defaultProxyUrl(proxyPort)}
 					bind:value={proxyUrl}
-					on:input|preventDefault={onInput}
-					on:change|preventDefault={onChange}
 				/>
 			</div>
 		</label>
 
-		<label class="block space-y-2 flex flex-col">
+		<label class="flex flex-col gap-2">
 			<span class="text-gray-700">
 				{_('Target service URL you want to access via your proxy:')}
 			</span>
 			<div class="h-8 sm:h-12">
 				<input
-					class="form-textarea bg-gray-100 block w-full h-full p-2 rounded-md flex-1 resize-none outline-gray-500"
+					class="form-textarea bg-gray-100 block w-full h-full p-2 placeholder:text-gray-400 rounded-md flex-1 resize-none outline-gray-500"
 					placeholder={placeholderServiceUrl}
 					bind:value={serviceUrl}
-					on:input|preventDefault={onInput}
-					on:change|preventDefault={onChange}
 				/>
 			</div>
 		</label>
 
-		<label class="block space-y-2 flex flex-col">
+		<label class="flex flex-col gap-2">
 			<span class="text-gray-700">
-				{_('Target service path of your request:')}
+				{_('Target service path of your request (optional):')}
 			</span>
 			<div class="h-8 sm:h-12">
 				<input
-					class="form-textarea bg-gray-100 block w-full h-full p-2 rounded-md flex-1 resize-none outline-gray-500"
+					class="form-textarea bg-gray-100 block w-full h-full p-2 placeholder:text-gray-400 rounded-md flex-1 resize-none outline-gray-500"
 					placeholder={placeholderServicePath}
 					bind:value={servicePath}
-					on:input|preventDefault={onInput}
-					on:change|preventDefault={onChange}
 				/>
 			</div>
 		</label>
@@ -183,17 +194,24 @@ function onChange()
 	</div>
 
 	<!-- Output group -->
-	<div class="bg-gray-100 p-4 space-y-4 col-span-2 sm:col-auto border border-gray-300 rounded-md">
-		<label class="block space-y-2 flex flex-col">
+	<div class="output-group bg-gray-100 p-4 space-y-4 col-span-2 sm:col-auto border border-gray-300 rounded-md">
+		<label class="flex flex-col gap-2">
 			<span class="text-gray-700">
 				{_('Formatted proxy URL pointing to the target service:')}
+				<button
+					type="button" class="copy-button" class:copied={lastCopiedSelector === 'output'}
+					on:click|preventDefault={copyInputValue.bind(null, 'output')}
+				>
+					<span class="icon icon-[mdi--content-copy] icon-align"></span>
+					{lastCopiedSelector === 'output' ? _('Copied!') : _('Copy')}
+				</button>
 			</span>
 			<div class="h-8 sm:h-12">
 				<input
-					class="form-textarea bg-gray-200 block w-full h-full p-2 rounded-md flex-1 resize-none"
+					id={`input-output-${idSuffix}`}
+					class="form-textarea bg-gray-200 block w-full h-full p-2 placeholder:text-gray-400 rounded-md flex-1 resize-none outline-gray-500"
 					placeholder="Enter the proxy and service URL"
-					bind:this={outputValueElement}
-					bind:value={outputUrl}
+					value={outputUrl(proxyPort, proxyUrl, serviceUrl, servicePath)}
 					disabled
 				/>
 			</div>
@@ -201,3 +219,25 @@ function onChange()
 	</div>
 
 </div>
+
+<style lang="scss">
+.copy-button {
+	@apply inline-flex items-center gap-1;
+	@apply ml-1 px-2 py-0.5 rounded-full;
+	@apply text-sm font-normal;
+	@apply text-gray-600 active:text-gray-700;
+	@apply bg-gray-100 active:bg-gray-200;
+
+	&.copied {
+		@apply bg-green-100 active:bg-green-200;
+	}
+}
+
+.output-group .copy-button {
+	@apply bg-gray-200 active:bg-gray-300;
+
+	&.copied {
+		@apply bg-green-200 active:bg-green-300;
+	}
+}
+</style>

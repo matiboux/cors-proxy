@@ -4,11 +4,14 @@ const defaultLocale =
 	'Simple CORS proxy server to bypass browser restrictions locally.',
 	'This tool allows you to format the proxy URL pointing to the target service you want to access without CORS restrictions.',
 	// AppForm
-	'Start the CORS Proxy server locally:',
-	'CORS Proxy server URL:',
+	'Start the CORS Proxy server locally.',
+	'Run on port:',
+	'CORS Proxy server URL (leave empty for default):',
 	'Target service URL you want to access via your proxy:',
-	'Target service path of your request:',
+	'Target service path of your request (optional):',
 	'Formatted proxy URL pointing to the target service:',
+	'Copy',
+	'Copied!',
 	// Footer
 	'Open source project',
 	'See the source code on {0}',
