@@ -160,7 +160,7 @@ function onChange()
 			</span>
 			<div class="h-8 sm:h-12">
 				<input
-					class="form-textarea bg-gray-100 block w-full h-full p-2 rounded-md flex-1 resize-none outline-gray-500"
+					class="form-textarea bg-gray-100 block w-full h-full p-2 placeholder:text-gray-600 rounded-md flex-1 resize-none outline-gray-500"
 					placeholder={defaultProxyUrl(proxyPort)}
 					bind:value={proxyUrl}
 					on:input|preventDefault={onInput}
@@ -175,7 +175,7 @@ function onChange()
 			</span>
 			<div class="h-8 sm:h-12">
 				<input
-					class="form-textarea bg-gray-100 block w-full h-full p-2 rounded-md flex-1 resize-none outline-gray-500"
+					class="form-textarea bg-gray-100 block w-full h-full p-2 placeholder:text-gray-400 rounded-md flex-1 resize-none outline-gray-500"
 					placeholder={placeholderServiceUrl}
 					bind:value={serviceUrl}
 					on:input|preventDefault={onInput}
@@ -190,7 +190,7 @@ function onChange()
 			</span>
 			<div class="h-8 sm:h-12">
 				<input
-					class="form-textarea bg-gray-100 block w-full h-full p-2 rounded-md flex-1 resize-none outline-gray-500"
+					class="form-textarea bg-gray-100 block w-full h-full p-2 placeholder:text-gray-400 rounded-md flex-1 resize-none outline-gray-500"
 					placeholder={placeholderServicePath}
 					bind:value={servicePath}
 					on:input|preventDefault={onInput}
@@ -213,7 +213,7 @@ function onChange()
 			</span>
 			<div class="h-8 sm:h-12">
 				<input
-					class="form-textarea bg-gray-200 block w-full h-full p-2 rounded-md flex-1 resize-none"
+					class="form-textarea bg-gray-200 block w-full h-full p-2 placeholder:text-gray-400 rounded-md flex-1 resize-none"
 					placeholder="Enter the proxy and service URL"
 					bind:this={outputValueElement}
 					bind:value={outputUrl}
