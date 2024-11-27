@@ -19,7 +19,7 @@ const placeholderServiceUrl: string = 'http://api.example.com'
 const placeholderServicePath: string = '/api/v1'
 
 let proxyPort: string = '80'
-let proxyUrl: string = placeholderProxyUrl
+let proxyUrl: string = ''
 let serviceUrl: string = ''
 let servicePath: string = ''
 
@@ -39,6 +39,16 @@ function parsePort(port: string): number
 	return parsedPort
 }
 
+function defaultProxyUrl(port: string): string
+{
+	const parsedPort = parsePort(port)
+	if (parsedPort === 80)
+	{
+		return placeholderProxyUrl
+	}
+	return `${placeholderProxyUrl}:${parsedPort}`
+}
+
 function convert()
 {
 	if (onInputConvertTimeout)
@@ -46,14 +56,7 @@ function convert()
 		clearTimeout(onInputConvertTimeout)
 	}
 
-	if (!proxyUrl)
-	{
-		outputUrl = ''
-		convertError = null
-		return
-	}
-
-	let newProxyUrl = proxyUrl.trim()
+	let newProxyUrl = proxyUrl ? proxyUrl.trim() : defaultProxyUrl(proxyPort)
 
 	let newServiceUrl = serviceUrl.trim()
 	if (newServiceUrl)
@@ -153,12 +156,12 @@ function onChange()
 
 		<label class="block space-y-2 flex flex-col">
 			<span class="text-gray-700">
-				{_('CORS Proxy server URL:')}
+				{_('CORS Proxy server URL (leave empty for default):')}
 			</span>
 			<div class="h-8 sm:h-12">
 				<input
 					class="form-textarea bg-gray-100 block w-full h-full p-2 rounded-md flex-1 resize-none outline-gray-500"
-					placeholder={placeholderProxyUrl}
+					placeholder={defaultProxyUrl(proxyPort)}
 					bind:value={proxyUrl}
 					on:input|preventDefault={onInput}
 					on:change|preventDefault={onChange}
@@ -183,7 +186,7 @@ function onChange()
 
 		<label class="block space-y-2 flex flex-col">
 			<span class="text-gray-700">
-				{_('Target service path of your request:')}
+				{_('Target service path of your request (optional):')}
 			</span>
 			<div class="h-8 sm:h-12">
 				<input

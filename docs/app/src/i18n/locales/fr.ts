@@ -11,12 +11,12 @@ const locale =
 	'Start the CORS Proxy server locally.':
 		'Démarrez le serveur proxy CORS localement.',
 	'Run on port:': 'Exécuter sur le port :',
-	'CORS Proxy server URL:':
-		'URL du serveur CORS Proxy :',
+	'CORS Proxy server URL (leave empty for default):':
+		'URL du serveur CORS Proxy (laissez vide pour la valeur par défaut) :',
 	'Target service URL you want to access via your proxy:':
 		'URL du service cible que vous souhaitez accéder via votre proxy :',
-	'Target service path of your request:':
-		'Chemin du service cible de votre demande :',
+	'Target service path of your request (optional):':
+		'Chemin du service cible de votre demande (facultatif) :',
 	'Formatted proxy URL pointing to the target service:':
 		'URL du proxy formatée pointant vers le service cible :',
 	// Footer

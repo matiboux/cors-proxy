@@ -6,9 +6,9 @@ const defaultLocale =
 	// AppForm
 	'Start the CORS Proxy server locally.',
 	'Run on port:',
-	'CORS Proxy server URL:',
+	'CORS Proxy server URL (leave empty for default):',
 	'Target service URL you want to access via your proxy:',
-	'Target service path of your request:',
+	'Target service path of your request (optional):',
 	'Formatted proxy URL pointing to the target service:',
 	// Footer
 	'Open source project',
