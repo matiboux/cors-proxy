@@ -8,8 +8,9 @@ const locale =
 	'This tool allows you to format the proxy URL pointing to the target service you want to access without CORS restrictions.':
 		'Cet outil vous permet de formater l\'URL du proxy pointant vers le service cible que vous souhaitez accéder sans restrictions CORS.',
 	// AppForm
-	'Start the CORS Proxy server locally:':
-		'Démarrez le serveur proxy CORS localement :',
+	'Start the CORS Proxy server locally.':
+		'Démarrez le serveur proxy CORS localement.',
+	'Run on port:': 'Exécuter sur le port :',
 	'CORS Proxy server URL:':
 		'URL du serveur CORS Proxy :',
 	'Target service URL you want to access via your proxy:':

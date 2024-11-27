@@ -110,8 +110,17 @@ function onChange()
 
 		<label class="block space-y-2 flex flex-col">
 			<span class="text-gray-700">
-				{_('Start the CORS Proxy server locally:')}
+				{_('Start the CORS Proxy server locally.')}
 			</span>
+			<div class="flex gap-2 items-center">
+				<span class="text-gray-700">
+					{_('Run on port:')}
+				</span>
+				<input
+					class="form-textarea bg-gray-100 block w-16 h-8 p-2 rounded-md flex-1 resize-none outline-gray-500"
+					value="80"
+				/>
+			</div>
 			<div class="h-8 sm:h-12">
 				<input
 					class="form-textarea bg-gray-100 block w-full h-full p-2 rounded-md flex-1 resize-none outline-gray-500"
