@@ -18,6 +18,7 @@ const placeholderProxyUrl: string = 'http://localhost'
 const placeholderServiceUrl: string = 'http://api.example.com'
 const placeholderServicePath: string = '/api/v1'
 
+let proxyPort: string = '80'
 let proxyUrl: string = placeholderProxyUrl
 let serviceUrl: string = ''
 let servicePath: string = ''
@@ -27,6 +28,16 @@ let outputValueElement = null
 let convertError: string | null = null
 
 let onInputConvertTimeout: NodeJS.Timeout | undefined = undefined
+
+function parsePort(port: string): number
+{
+	const parsedPort = Number(port)
+	if (!Number.isInteger(parsedPort))
+	{
+		return 80
+	}
+	return parsedPort
+}
 
 function convert()
 {
@@ -118,13 +129,13 @@ function onChange()
 				</span>
 				<input
 					class="form-textarea bg-gray-100 block w-16 h-8 p-2 rounded-md flex-1 resize-none outline-gray-500"
-					value="80"
+					bind:value={proxyPort}
 				/>
 			</div>
 			<div class="h-8 sm:h-12">
 				<input
 					class="form-textarea bg-gray-100 block w-full h-full p-2 rounded-md flex-1 resize-none outline-gray-500"
-					value="docker run -p 80:8080 ghcr.io/matiboux/cors-proxy"
+					value={`docker run -p ${parsePort(proxyPort)}:8080 ghcr.io/matiboux/cors-proxy`}
 					disabled
 				/>
 			</div>
