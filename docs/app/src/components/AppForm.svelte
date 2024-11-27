@@ -14,6 +14,9 @@ export {
 import { i18nFactory } from '~/i18n'
 const _ = i18nFactory(locale as any)
 
+// Generate a random suffix for id attributes
+const idSuffix = Math.random().toString(36).substring(2)
+
 const placeholderProxyUrl: string = 'http://localhost'
 const placeholderServiceUrl: string = 'http://api.example.com'
 const placeholderServicePath: string = '/api/v1'
@@ -25,7 +28,7 @@ let servicePath: string = ''
 
 let convertError: string | null = null
 
-let onInputConvertTimeout: NodeJS.Timeout | undefined = undefined
+let lastCopiedSelector: string | null = null
 
 function parsePort(port: string): number
 {
@@ -83,6 +86,16 @@ function outputUrl(
 		return ''
 	}
 }
+
+function copyInputValue(selector: string, event: MouseEvent)
+{
+	const target = document.getElementById(`input-${selector}-${idSuffix}`) as HTMLInputElement | null
+	if (target)
+	{
+		lastCopiedSelector = selector
+		navigator.clipboard.writeText(target.value)
+	}
+}
 </script>
 
 <div
@@ -98,6 +111,13 @@ function outputUrl(
 		<label class="flex flex-col gap-2">
 			<span class="text-gray-700">
 				{_('Start the CORS Proxy server locally.')}
+				<button
+					type="button" class="copy-button" class:copied={lastCopiedSelector === 'proxy'}
+					on:click|preventDefault={copyInputValue.bind(null, 'proxy')}
+				>
+					<span class="icon icon-[mdi--content-copy] icon-align"></span>
+					{lastCopiedSelector === 'proxy' ? _('Copied!') : _('Copy')}
+				</button>
 			</span>
 			<div class="flex gap-2 items-center">
 				<span class="text-gray-700">
@@ -110,6 +130,7 @@ function outputUrl(
 			</div>
 			<div class="h-8 sm:h-12">
 				<input
+					id={`input-proxy-${idSuffix}`}
 					class="form-textarea bg-gray-100 block w-full h-full p-2 rounded-md flex-1 resize-none outline-gray-500"
 					value={`docker run -p ${parsePort(proxyPort)}:8080 ghcr.io/matiboux/cors-proxy`}
 					disabled
@@ -173,14 +194,22 @@ function outputUrl(
 	</div>
 
 	<!-- Output group -->
-	<div class="bg-gray-100 p-4 space-y-4 col-span-2 sm:col-auto border border-gray-300 rounded-md">
+	<div class="output-group bg-gray-100 p-4 space-y-4 col-span-2 sm:col-auto border border-gray-300 rounded-md">
 		<label class="flex flex-col gap-2">
 			<span class="text-gray-700">
 				{_('Formatted proxy URL pointing to the target service:')}
+				<button
+					type="button" class="copy-button" class:copied={lastCopiedSelector === 'output'}
+					on:click|preventDefault={copyInputValue.bind(null, 'output')}
+				>
+					<span class="icon icon-[mdi--content-copy] icon-align"></span>
+					{lastCopiedSelector === 'output' ? _('Copied!') : _('Copy')}
+				</button>
 			</span>
 			<div class="h-8 sm:h-12">
 				<input
-					class="form-textarea bg-gray-200 block w-full h-full p-2 placeholder:text-gray-400 rounded-md flex-1 resize-none"
+					id={`input-output-${idSuffix}`}
+					class="form-textarea bg-gray-200 block w-full h-full p-2 placeholder:text-gray-400 rounded-md flex-1 resize-none outline-gray-500"
 					placeholder="Enter the proxy and service URL"
 					value={outputUrl(proxyPort, proxyUrl, serviceUrl, servicePath)}
 					disabled
@@ -190,3 +219,25 @@ function outputUrl(
 	</div>
 
 </div>
+
+<style lang="scss">
+.copy-button {
+	@apply inline-flex items-center gap-1;
+	@apply ml-1 px-2 py-0.5 rounded-full;
+	@apply text-sm font-normal;
+	@apply text-gray-600 active:text-gray-700;
+	@apply bg-gray-100 active:bg-gray-200;
+
+	&.copied {
+		@apply bg-green-100 active:bg-green-200;
+	}
+}
+
+.output-group .copy-button {
+	@apply bg-gray-200 active:bg-gray-300;
+
+	&.copied {
+		@apply bg-green-200 active:bg-green-300;
+	}
+}
+</style>
