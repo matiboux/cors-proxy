@@ -7,10 +7,13 @@ on:
     branches:
       - main # Production
     paths:
+      # CI files
       - '.github/workflows/deploy.yml'
-      - 'app/**'
-      - 'docker-compose.yml'
-      - 'docker-compose.cicd.yml'
+      - 'docker-compose-docs.yml'
+      - 'docker-compose-docs.cicd.yml'
+      - '.env'
+      # Application files
+      - 'docs/**'
 
   # Run on manual triggers
   workflow_dispatch:
