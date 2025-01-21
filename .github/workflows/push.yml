@@ -183,7 +183,7 @@ jobs:
           IMAGES_BASENAME="$(echo "${IMAGES_BASENAME}" | tr '[:upper:]' '[:lower:]')"
 
           # Set IMAGES_PREFIX environment variable
-          IMAGES_PREFIX="${NAMESPACE}/${IMAGES_NAME}"
+          IMAGES_PREFIX="${NAMESPACE}/${IMAGES_BASENAME}"
           echo "Set IMAGES_PREFIX to '${IMAGES_PREFIX}'"
           echo 'IMAGES_PREFIX<<GITHUB_ENV_EOF' >> $GITHUB_ENV
           echo "${IMAGES_PREFIX}" >> $GITHUB_ENV
