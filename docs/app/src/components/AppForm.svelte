@@ -132,7 +132,7 @@ function copyInputValue(selector: string, event: MouseEvent)
 				<input
 					id={`input-proxy-${idSuffix}`}
 					class="form-textarea bg-gray-100 block w-full h-full p-2 rounded-md flex-1 resize-none outline-gray-500"
-					value={`docker run -p ${parsePort(proxyPort)}:8080 ghcr.io/matiboux/cors-proxy`}
+					value={`docker run -p ${parsePort(proxyPort)}:8080 matiboux/cors-proxy`}
 					disabled
 				/>
 			</div>
