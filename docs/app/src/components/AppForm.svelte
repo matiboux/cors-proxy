@@ -1,5 +1,5 @@
 <script lang="ts">
-import { onMount } from 'svelte'
+import { proxyPortStore } from '~/stores/proxyPortStore'
 
 // Props
 let userClass: string | undefined = undefined
@@ -21,7 +21,6 @@ const placeholderProxyUrl: string = 'http://localhost'
 const placeholderServiceUrl: string = 'http://api.example.com'
 const placeholderServicePath: string = '/api/v1'
 
-let proxyPort: string = '80'
 let proxyUrl: string = ''
 let serviceUrl: string = ''
 let servicePath: string = ''
@@ -51,7 +50,7 @@ function defaultProxyUrl(port: string): string
 }
 
 function outputUrl(
-	port: string,
+	proxyPort: string,
 	proxyUrl: string,
 	serviceUrl: string,
 	servicePath: string,
@@ -125,14 +124,14 @@ function copyInputValue(selector: string, event: MouseEvent)
 				</span>
 				<input
 					class="form-textarea bg-gray-100 block w-16 h-8 p-2 rounded-md flex-1 resize-none outline-gray-500"
-					bind:value={proxyPort}
+					bind:value={$proxyPortStore}
 				/>
 			</div>
 			<div class="h-8 sm:h-12">
 				<input
 					id={`input-proxy-${idSuffix}`}
 					class="form-textarea bg-gray-100 block w-full h-full p-2 rounded-md flex-1 resize-none outline-gray-500"
-					value={`docker run -p ${parsePort(proxyPort)}:8080 ghcr.io/matiboux/cors-proxy`}
+					value={`docker run -p ${parsePort($proxyPortStore)}:8080 matiboux/cors-proxy`}
 					disabled
 				/>
 			</div>
@@ -155,7 +154,7 @@ function copyInputValue(selector: string, event: MouseEvent)
 			<div class="h-8 sm:h-12">
 				<input
 					class="form-textarea bg-gray-100 block w-full h-full p-2 placeholder:text-gray-600 rounded-md flex-1 resize-none outline-gray-500"
-					placeholder={defaultProxyUrl(proxyPort)}
+					placeholder={defaultProxyUrl($proxyPortStore)}
 					bind:value={proxyUrl}
 				/>
 			</div>
@@ -211,7 +210,7 @@ function copyInputValue(selector: string, event: MouseEvent)
 					id={`input-output-${idSuffix}`}
 					class="form-textarea bg-gray-200 block w-full h-full p-2 placeholder:text-gray-400 rounded-md flex-1 resize-none outline-gray-500"
 					placeholder="Enter the proxy and service URL"
-					value={outputUrl(proxyPort, proxyUrl, serviceUrl, servicePath)}
+					value={outputUrl($proxyPortStore, proxyUrl, serviceUrl, servicePath)}
 					disabled
 				/>
 			</div>
