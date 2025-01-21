@@ -5,14 +5,14 @@ on:
   # Run on push on primary branches
   push:
     branches:
-      - master
-      - main
-      - prod
-      - production
+      - main # Production
     paths:
+      # CI files
       - '.github/workflows/push.yml'
+      - 'docker-compose.yml'
+      - '.env'
+      # Application files
       - 'proxy/**'
-      - 'docker-compose*.yml'
 
   # Run on manual triggers
   workflow_dispatch:
@@ -49,153 +49,198 @@ jobs:
 
     steps:
 
+      # Steps dependencies
+
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Login to GitHub Docker registry (GitHub Container Registry)
+      - name: Set DEPLOY_ENV environment variable
+        env:
+          GITHUB_REF: ${{ github.ref }}
+        run: |
+          # Set DEPLOY_ENV environment variable
+          if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
+            DEPLOY_ENV="PROD"
+          else
+            DEPLOY_ENV="DEV"
+          fi
+          echo "Set DEPLOY_ENV to '${DEPLOY_ENV}'"
+          echo 'DEPLOY_ENV<<GITHUB_ENV_EOF' >> $GITHUB_ENV
+          echo "${DEPLOY_ENV}" >> $GITHUB_ENV
+          echo 'GITHUB_ENV_EOF' >> $GITHUB_ENV
+
+      # Execution steps
+
+      - name: Login to GitHub Docker registry
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Build for production
+        env:
+          IMAGES_PREFIX: 'app'
+          IMAGES_TAG: ${{ github.sha }}
+        run: |
+          # docker compose build
+          docker compose \
+              -f ./docker-compose.yml \
+              --env-file .env \
+              build
+
       - name: Set IMAGES_PREFIX for GitHub Docker registry images
         env:
           REGISTRY: ${{ env.REGISTRY }}
           NAMESPACE: ${{ github.repository_owner }}
-          IMAGES_NAME: ${{ github.event.repository.name }}
+          IMAGES_BASENAME: ${{ github.event.repository.name }}
         run: |
-          # Convert variables to lowercase
+          # Set IMAGES_PREFIX environment variable
+
+          # Transform variables to lowercase
           REGISTRY="$(echo "${REGISTRY}" | tr '[:upper:]' '[:lower:]')"
           NAMESPACE="$(echo "${NAMESPACE}" | tr '[:upper:]' '[:lower:]')"
-          IMAGES_NAME="$(echo "${IMAGES_NAME}" | tr '[:upper:]' '[:lower:]')"
+          IMAGES_BASENAME="$(echo "${IMAGES_BASENAME}" | tr '[:upper:]' '[:lower:]')"
 
           # Set IMAGES_PREFIX environment variable
-          echo 'IMAGES_PREFIX<<DOCKER_ENV_EOF' >> $GITHUB_ENV
-          echo "${REGISTRY}/${NAMESPACE}/${IMAGES_NAME}" >> $GITHUB_ENV
-          echo 'DOCKER_ENV_EOF' >> $GITHUB_ENV
+          IMAGES_PREFIX="${REGISTRY}/${NAMESPACE}/${IMAGES_BASENAME}"
+          echo "Set IMAGES_PREFIX to '${IMAGES_PREFIX}'"
+          echo 'IMAGES_PREFIX<<GITHUB_ENV_EOF' >> $GITHUB_ENV
+          echo "${IMAGES_PREFIX}" >> $GITHUB_ENV
+          echo 'GITHUB_ENV_EOF' >> $GITHUB_ENV
 
-      - name: Pull latest Docker images for build cache
+      - name: Retag Docker images for GitHub Docker registry (tag commit SHA)
         env:
-          IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
-          IMAGES_TAG: latest
-        run: docker compose -f docker-compose.yml pull --ignore-pull-failures
-
-      - name: Build Docker images for current commit (tag commit SHA)
-        env:
-          IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
-          IMAGES_TAG: ${{ github.sha }}
-        run: docker compose -f docker-compose.yml build
-
-      - name: Push Docker images for current commit (tag commit SHA)
-        env:
-          IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
-          IMAGES_TAG: ${{ github.sha }}
-        run: docker compose -f docker-compose.yml push
-
-      - name: Retag Docker images for main branch (tag 'latest')
-        if: github.ref == 'refs/heads/main' # Only run on main branch
-        env:
-          IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
+          IMAGES_PREFIX: 'app'
           IMAGES_TAG: ${{ github.sha }}
           NEW_IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
-          NEW_IMAGES_TAG: latest
+          NEW_IMAGES_TAG: ${{ github.sha }}
         run: |
+          # docker tag for each image
           docker compose -f docker-compose.yml config --images | while read -r IMAGE; do
             echo "Retag '${IMAGE}' to '${NEW_IMAGES_PREFIX}:${NEW_IMAGES_TAG}'"
             docker tag "${IMAGE}" "${NEW_IMAGES_PREFIX}:${NEW_IMAGES_TAG}"
           done
 
-      - name: Push Docker images for main branch (tag 'latest')
-        if: github.ref == 'refs/heads/main' # Only run on main branch
+      - name: Push Docker images to GitHub Docker registry (tag commit SHA)
+        env:
+          IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
+          IMAGES_TAG: ${{ github.sha }}
+        run: |
+          # docker compose push
+          docker compose \
+              -f ./docker-compose.yml \
+              --env-file .env \
+              push
+
+      - name: Retag Docker images for GitHub Docker registry (tag latest)
+        # Only run in production
+        if: env.DEPLOY_ENV == 'PROD'
+        env:
+          IMAGES_PREFIX: 'app'
+          IMAGES_TAG: ${{ github.sha }}
+          NEW_IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
+          NEW_IMAGES_TAG: latest
+        run: |
+          # docker tag for each image
+          docker compose -f docker-compose.yml config --images | while read -r IMAGE; do
+            echo "Retag '${IMAGE}' to '${NEW_IMAGES_PREFIX}:${NEW_IMAGES_TAG}'"
+            docker tag "${IMAGE}" "${NEW_IMAGES_PREFIX}:${NEW_IMAGES_TAG}"
+          done
+
+      - name: Push Docker images to GitHub Docker registry (tag latest)
+        # Only run in production
+        if: env.DEPLOY_ENV == 'PROD'
         env:
           IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
           IMAGES_TAG: latest
-        run: docker compose -f docker-compose.yml push
-
-  # Push Docker Hub job
-  push-docker-hub:
-    name: Push Docker Hub
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    needs:
-      - push
-
-    # Set GITHUB_TOKEN permissions for the job
-    permissions:
-      contents: read
-      packages: read
-
-    # Set environment variables for the job
-    env:
-      IMAGES_ORIGIN_PREFIX: ${{ needs.push.outputs.IMAGES_PREFIX }}
-
-    steps:
-
-      - name: Checkout
-        uses: actions/checkout@v4
+        run: |
+          # docker compose push
+          docker compose \
+              -f ./docker-compose.yml \
+              --env-file .env \
+              push
 
       - name: Login to Docker Hub registry
+        # Only run if Docker Hub is configured
+        if: vars.DOCKERHUB_USERNAME
         uses: docker/login-action@v3
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Set IMAGES_PREFIX for Docker Hub registry images
+        # Only run if Docker Hub is configured
+        if: vars.DOCKERHUB_USERNAME
         env:
           NAMESPACE: ${{ vars.DOCKERHUB_USERNAME }}
-          IMAGES_NAME: ${{ github.event.repository.name }}
+          IMAGES_BASENAME: ${{ github.event.repository.name }}
         run: |
-          # Convert variables to lowercase
+          # Set IMAGES_PREFIX environment variable
+
+          # Transform variables to lowercase
           NAMESPACE="$(echo "${NAMESPACE}" | tr '[:upper:]' '[:lower:]')"
-          IMAGES_NAME="$(echo "${IMAGES_NAME}" | tr '[:upper:]' '[:lower:]')"
+          IMAGES_BASENAME="$(echo "${IMAGES_BASENAME}" | tr '[:upper:]' '[:lower:]')"
 
           # Set IMAGES_PREFIX environment variable
-          echo 'IMAGES_PREFIX<<DOCKER_ENV_EOF' >> $GITHUB_ENV
-          echo "${NAMESPACE}/${IMAGES_NAME}" >> $GITHUB_ENV
-          echo 'DOCKER_ENV_EOF' >> $GITHUB_ENV
+          IMAGES_PREFIX="${NAMESPACE}/${IMAGES_NAME}"
+          echo "Set IMAGES_PREFIX to '${IMAGES_PREFIX}'"
+          echo 'IMAGES_PREFIX<<GITHUB_ENV_EOF' >> $GITHUB_ENV
+          echo "${IMAGES_PREFIX}" >> $GITHUB_ENV
+          echo 'GITHUB_ENV_EOF' >> $GITHUB_ENV
 
-      - name: Pull built Docker images from GitHub registry
+      - name: Retag Docker images for Docker Hub registry (tag commit SHA)
+        # Only run if Docker Hub is configured
+        if: vars.DOCKERHUB_USERNAME
         env:
-          IMAGES_PREFIX: ${{ env.IMAGES_ORIGIN_PREFIX }}
-          IMAGES_TAG: ${{ github.sha }}
-        run: docker compose -f docker-compose.yml pull
-
-      - name: Retag Docker images for Docker Hub (tag commit SHA)
-        env:
-          IMAGES_PREFIX: ${{ env.IMAGES_ORIGIN_PREFIX }}
+          IMAGES_PREFIX: 'app'
           IMAGES_TAG: ${{ github.sha }}
           NEW_IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
           NEW_IMAGES_TAG: ${{ github.sha }}
         run: |
+          # docker tag for each image
           docker compose -f docker-compose.yml config --images | while read -r IMAGE; do
             echo "Retag '${IMAGE}' to '${NEW_IMAGES_PREFIX}:${NEW_IMAGES_TAG}'"
             docker tag "${IMAGE}" "${NEW_IMAGES_PREFIX}:${NEW_IMAGES_TAG}"
           done
 
-      - name: Push Docker images for Docker Hub (tag commit SHA)
+      - name: Push Docker images to Docker Hub registry (tag commit SHA)
+        # Only run if Docker Hub is configured
+        if: vars.DOCKERHUB_USERNAME
         env:
           IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
           IMAGES_TAG: ${{ github.sha }}
-        run: docker compose -f docker-compose.yml push
+        run: |
+          # docker compose push
+          docker compose \
+              -f ./docker-compose.yml \
+              --env-file .env \
+              push
 
-      - name: Retag Docker images for Docker Hub (tag 'latest')
-        if: github.ref == 'refs/heads/main' # Only run on main branch
+      - name: Retag Docker images for Docker Hub registry (tag latest)
+        # Only run in production if Docker Hub is configured
+        if: env.DEPLOY_ENV == 'PROD' && vars.DOCKERHUB_USERNAME
         env:
-          IMAGES_PREFIX: ${{ env.IMAGES_ORIGIN_PREFIX }}
+          IMAGES_PREFIX: 'app'
           IMAGES_TAG: ${{ github.sha }}
           NEW_IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
           NEW_IMAGES_TAG: latest
         run: |
+          # docker tag for each image
           docker compose -f docker-compose.yml config --images | while read -r IMAGE; do
             echo "Retag '${IMAGE}' to '${NEW_IMAGES_PREFIX}:${NEW_IMAGES_TAG}'"
             docker tag "${IMAGE}" "${NEW_IMAGES_PREFIX}:${NEW_IMAGES_TAG}"
           done
 
-      - name: Push Docker images for Docker Hub (tag 'latest')
-        if: github.ref == 'refs/heads/main' # Only run on main branch
+      - name: Push Docker images to Docker Hub registry (tag latest)
+        # Only run in production if Docker Hub is configured
+        if: env.DEPLOY_ENV == 'PROD' && vars.DOCKERHUB_USERNAME
         env:
           IMAGES_PREFIX: ${{ env.IMAGES_PREFIX }}
           IMAGES_TAG: latest
-        run: docker compose -f docker-compose.yml push
+        run: |
+          # docker compose push
+          docker compose \
+              -f ./docker-compose.yml \
+              --env-file .env \
+              push
