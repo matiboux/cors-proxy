@@ -66,13 +66,13 @@ jobs:
 
       - name: Chown dist folder to $USER
         run: |
-          # chown -R $USER:$USER ./app/dist
-          sudo chown -R $USER:$USER ./app/dist
+          # chown -R $USER:$USER ./docs/dist
+          sudo chown -R $USER:$USER ./docs/dist
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./app/dist
+          path: ./docs/dist
 
   # Deploy Docs job
   deploy:
