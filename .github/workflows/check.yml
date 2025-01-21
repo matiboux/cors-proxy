@@ -5,20 +5,16 @@ on:
   # Run on pull requests to primary branches
   pull_request:
     branches:
-      - master
-      - main
-      - prod
-      - production
-      - staging
-      - dev
-      - develop
-      - development
-      - test
+      - main # Production
+      - dev # Development
     paths:
+      # CI files
       - '.github/workflows/check.yml'
-      - 'docs/**'
       - 'docker-compose-docs.yml'
       - 'docker-compose-docs.cicd.yml'
+      - '.env'
+      # Application files
+      - 'docs/**'
 
   # Run on manual triggers
   workflow_dispatch:
@@ -42,21 +38,36 @@ jobs:
 
     steps:
 
+      # Steps dependencies
+
       - name: Checkout
         uses: actions/checkout@v4
+
+      # Execution steps
 
       - name: Build for production
         env:
           GITHUB_REPOSITORY_URL: https://github.com/${{ github.repository }}
           GITHUB_SHA: ${{ github.sha }}
           BUILD_CHECK: "true" # Run type checks
-        run: docker compose -f docker-compose-docs.yml -f docker-compose-docs.cicd.yml build
+        run: |
+          # docker compose build
+          docker compose \
+              -f ./docker-compose-docs.yml -f ./docker-compose-docs.cicd.yml \
+              --env-file .env \
+              build
 
       - name: Copy application files
-        run: docker compose -f docker-compose-docs.yml -f docker-compose-docs.cicd.yml up
+        run: |
+          # docker compose up
+          docker compose \
+              -f ./docker-compose-docs.yml -f ./docker-compose-docs.cicd.yml \
+              --env-file .env \
+              up
 
       - name: Check application files
         run: |
+          # Check application files
           [ -d ./docs/dist ] && [ $(ls -1 ./docs/dist | wc -l) -gt 0 ] \
             && echo "Application files found" \
             || ( echo "No application files found" && exit 1 )
