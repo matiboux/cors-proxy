@@ -57,6 +57,6 @@ jobs:
 
       - name: Check application files
         run: |
-          [ -d ./app/dist ] && [ $(ls -1 ./app/dist | wc -l) -gt 0 ] \
+          [ -d ./docs/dist ] && [ $(ls -1 ./docs/dist | wc -l) -gt 0 ] \
             && echo "Application files found" \
             || ( echo "No application files found" && exit 1 )
