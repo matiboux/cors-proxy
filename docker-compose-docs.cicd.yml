@@ -2,14 +2,30 @@
 
 services:
 
+  docs-volumes:
+    # Build
+    image: matiboux/chown-volumes:latest
+    # Deploy
+    environment:
+      UID: ${DOCKER_UID:-${UID:-1000}}
+      VOLUMES: |
+        /dist
+    volumes:
+      - ./docs/dist:/dist
+
   docs:
     # Build override
     image: ${IMAGES_PREFIX:-app}-docs-cicd:${IMAGES_TAG:-latest}
     build:
       target: app_prod_build
       args:
-        BUILD_CHECK: ${BUILD_CHECK:-true}
+        UID: ${DOCKER_UID:-${UID:-1000}}
     # Deploy override
+    depends_on:
+      docs-volumes:
+        condition: service_completed_successfully
+    user: ${DOCKER_UID:-${UID:-1000}}
+    environment: !reset null
+    command: [ 'sh', '-c', 'rm -rf /dist/* && cp -r /app/dist/* /dist' ]
     volumes:
-      - ./docs/dist:/tmp/dist
-    command: [ "sh", "-c", "rm -rf /tmp/dist/* && cp -r /app/dist/* /tmp/dist" ]
+      - ./docs/dist:/dist
