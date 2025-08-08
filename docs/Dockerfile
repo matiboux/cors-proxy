@@ -88,6 +88,70 @@ CMD [ "--help" ]
 
 
 # --
+# Test base image
+
+FROM app_build_base AS app_test_base
+
+# Build arguments
+ARG UID
+
+# Set runtime environment
+ENV APP_ENV=test
+ENV NODE_ENV=development
+
+# Copy app development dependencies
+COPY --link --from=app_build_dev --chown="${UID}:0" /app/node_modules ./node_modules
+
+
+# --
+# Test unit image
+
+FROM app_test_base AS app_test_unit
+
+# Build arguments
+ARG UID
+
+# Copy source code
+COPY --link --chown="${UID}:0" ./app .
+
+# Run as non-root user
+USER ${UID}:0
+
+CMD [ "sh", "-c", "pnpm run test:vitest" ]
+
+
+# --
+# Test E2E image
+
+FROM app_test_base AS app_test_e2e
+
+# Build arguments
+ARG UID
+
+# Configure Playwright
+ENV PLAYWRIGHT_BROWSERS_PATH=/etc/playwright/browsers
+
+# Install Playwright dependencies
+# (hadolint: Ignore non-pinned apt package version)
+# hadolint ignore=DL3008
+RUN --mount=type=bind,source=./app/package.json,target=package.json \
+	--mount=type=cache,sharing=locked,target=/var/cache/apt \
+	--mount=type=cache,sharing=locked,target=/var/lib/apt \
+	pnpm exec playwright install --with-deps
+
+# Copy source code
+COPY --link --chown="${UID}:0" ./app .
+
+# Build application
+RUN pnpm run build-only
+
+# Run as non-root user
+USER ${UID}:0
+
+CMD [ "sh", "-c", "pnpm run test:playwright --output /tmp/playwright/test-results" ]
+
+
+# --
 # Dev image
 
 FROM app_base AS app_dev
