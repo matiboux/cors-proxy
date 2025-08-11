@@ -1,7 +1,8 @@
-import type { I18n, Diff } from '../type'
+import type { Diff } from '~/i18n/types.d.ts'
 
-const locale =
-{
+import type { DefaultLocaleKeys } from './types.d.ts'
+
+const locale = {
 	// Index
 	'Simple CORS proxy server to bypass browser restrictions locally.':
 		'Serveur proxy CORS simple pour contourner les restrictions du navigateur localement.',
@@ -35,9 +36,8 @@ const locale =
 		'Ce site web n\'utilise pas de cookies et ne fait pas de suivi.',
 } as const
 
-// Static type check
 export default locale satisfies
-	// Check for missing keys:
-	Readonly<Record<Diff<keyof I18n, keyof typeof locale>, string>> &
-	// Check for extra keys:
-	Readonly<Record<Diff<keyof typeof locale, keyof I18n>, never>>
+	// Static type check for missing keys
+	Readonly<Record<Diff<DefaultLocaleKeys, keyof typeof locale>, string>> &
+	// Static type check for extra keys
+	Readonly<Record<Diff<keyof typeof locale, DefaultLocaleKeys>, never>>
