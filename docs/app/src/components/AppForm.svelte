@@ -141,7 +141,7 @@ function copyInputValue(selector: string, event: MouseEvent)
 
 	<!-- Step separator -->
 	<div class="pl-2 text-xl text-gray-600">
-		<span class="icon-[mdi--plus] align-icon-inline"></span>
+		<span class="icon-[mdi--plus] icon-align"></span>
 	</div>
 
 	<!-- Input group -->
@@ -189,7 +189,7 @@ function copyInputValue(selector: string, event: MouseEvent)
 
 	<!-- Convertion separator -->
 	<div class="pl-2 text-xl text-gray-600">
-		<span class="icon-[mdi--arrow-down] align-icon-inline"></span>
+		<span class="icon-[mdi--arrow-down] icon-align"></span>
 	</div>
 
 	<!-- Output group -->
