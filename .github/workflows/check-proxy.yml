@@ -1,0 +1,71 @@
+name: Check Proxy CI
+
+# GitHub variables: N/A
+
+# GitHub secrets: N/A
+
+on:
+
+  # Run on pull requests to primary branches
+  pull_request:
+    branches:
+      # Production
+      - main
+      # Staging
+      - staging
+      # Development
+      - dev
+    paths:
+      # CI/CD files
+      - '.github/workflows/check-proxy.yml'
+      - 'docker-compose.yml'
+      - '.env'
+      # Application files
+      - 'proxy/**'
+
+  # Run on manual triggers
+  workflow_dispatch:
+
+# Set default GITHUB_TOKEN permissions for the workflow
+permissions:
+  contents: read
+
+# Set workflow concurrency rules
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  # Build job
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+
+      # Steps dependencies
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Execution steps
+
+      - name: Pull dependencies
+        run: |
+          # docker compose pull --ignore-buildable
+          docker compose \
+            -f ./docker-compose.yml \
+            --env-file .env \
+            pull --ignore-buildable
+
+      - name: Build for production
+        run: |
+          # docker compose build
+          echo '::group::Build details'
+          docker compose \
+            -f ./docker-compose.yml \
+            --env-file .env \
+            build
+          echo '::endgroup::'
