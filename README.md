@@ -39,7 +39,7 @@ Use this command to run the documentation site locally for development:
 
 ```sh
 docker compose -f docker-compose-docs.yml -f docker-compose-docs.override.yml watch
-# or: dockerc docs @w
+# or: dockerc docs.override @w
 ```
 
 
