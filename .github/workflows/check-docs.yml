@@ -21,7 +21,7 @@ on:
       - dev
     paths:
       # CI/CD files
-      - '.github/workflows/check.yml'
+      - '.github/workflows/check-docs.yml'
       - 'docker-compose-docs.yml'
       - 'docker-compose-docs.cicd.yml'
       - 'docker-compose-docs.test-unit.yml'
