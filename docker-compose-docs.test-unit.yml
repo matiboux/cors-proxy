@@ -2,13 +2,13 @@
 
 services:
 
-  app:
+  docs:
     # Extend
     extends:
       file: ./docker-compose-docs.yml
-      service: app
+      service: docs
     # Build override
-    image: ${IMAGES_PREFIX:-app}-test-unit:${IMAGES_TAG:-latest}
+    image: ${IMAGES_PREFIX:-app}-docs-test-unit:${IMAGES_TAG:-latest}
     build:
       target: app_test_unit
       args:
