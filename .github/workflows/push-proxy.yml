@@ -1,14 +1,21 @@
-name: Push Docker CD
+name: Push Proxy CD
+
+# GitHub variables:
+# - DOCKERHUB_USERNAME
+
+# GitHub secrets:
+# - DOCKERHUB_TOKEN
 
 on:
 
-  # Run on push on primary branches
+  # Run on push on production branches
   push:
     branches:
-      - main # Production
+      # Production
+      - main
     paths:
-      # CI files
-      - '.github/workflows/push.yml'
+      # CI/CD files
+      - '.github/workflows/push-proxy.yml'
       - 'docker-compose.yml'
       - '.env'
       # Application files
@@ -17,22 +24,22 @@ on:
   # Run on manual triggers
   workflow_dispatch:
 
-# Set GITHUB_TOKEN permissions for the workflow
+# Set default GITHUB_TOKEN permissions for the workflow
 permissions:
   contents: read
 
 # Set workflow concurrency rules
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
 
 jobs:
 
-  # Push Docker job
+  # Push job
   push:
-    name: Push Docker
+    name: Push
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     # Set GITHUB_TOKEN permissions for the job
     permissions:
@@ -49,7 +56,7 @@ jobs:
 
     steps:
 
-      # Steps dependencies
+      # Dependency steps
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -69,14 +76,22 @@ jobs:
           echo "${DEPLOY_ENV}" >> $GITHUB_ENV
           echo 'GITHUB_ENV_EOF' >> $GITHUB_ENV
 
-      # Execution steps
-
       - name: Login to GitHub Docker registry
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Execution steps
+
+      - name: Pull dependencies
+        run: |
+          # docker compose pull --ignore-buildable
+          docker compose \
+            -f ./docker-compose.yml \
+            --env-file .env \
+            pull --ignore-buildable
 
       - name: Build for production
         env:
@@ -85,9 +100,9 @@ jobs:
         run: |
           # docker compose build
           docker compose \
-              -f ./docker-compose.yml \
-              --env-file .env \
-              build
+            -f ./docker-compose.yml \
+            --env-file .env \
+            build
 
       - name: Set IMAGES_PREFIX for GitHub Docker registry images
         env:

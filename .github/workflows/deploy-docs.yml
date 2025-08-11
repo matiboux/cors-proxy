@@ -17,7 +17,7 @@ on:
       - main
     paths:
       # CI/CD files
-      - '.github/workflows/deploy.yml'
+      - '.github/workflows/deploy-docs.yml'
       - 'docker-compose-docs.yml'
       - 'docker-compose-docs.cicd.yml'
       - '.env'
