@@ -18,6 +18,31 @@ You can pull and run the CORS Proxy Docker image from either:
 - The [GitHub Container Registry](https://github.com/matiboux/cors-proxy/pkgs/container/cors-proxy): `docker pull ghcr.io/matiboux/cors-proxy`
 
 
+## Development
+
+### CORS Proxy
+
+Use this command to run the program locally for development:
+
+```sh
+docker compose watch
+# or: docker compose up
+```
+
+Using `watch`, you'll benefit from file changes watching for sync & rebuild.
+
+Use [DockerC](https://github.com/matiboux/dockerc) for shortened commands: `dockerc - @w`.
+
+### Documentation
+
+Use this command to run the documentation site locally for development:
+
+```sh
+docker compose -f docker-compose-docs.yml -f docker-compose-docs.override.yml watch
+# or: dockerc docs @w
+```
+
+
 ## License
 
 Copyright (c) 2024-2025 [Matiboux](https://github.com/matiboux) ([matiboux.me](https://matiboux.me))
