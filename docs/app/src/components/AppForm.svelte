@@ -220,6 +220,8 @@ function copyInputValue(selector: string, event: MouseEvent)
 </div>
 
 <style lang="scss">
+@reference "tailwindcss/theme";
+
 .copy-button {
 	@apply inline-flex items-center gap-1;
 	@apply ml-1 px-2 py-0.5 rounded-full;
