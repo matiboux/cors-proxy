@@ -19,5 +19,3 @@ services:
         - action: sync+restart
           path: ./proxy/app
           target: /app
-          ignore:
-            - node_modules/

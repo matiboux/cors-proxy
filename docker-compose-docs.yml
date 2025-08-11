@@ -4,8 +4,16 @@ x-common:
 
   docs:
     environment: &docs_environment
+      # Deployment configuration
       GITHUB_REPOSITORY_URL: ${GITHUB_REPOSITORY_URL:-}
       GITHUB_SHA: ${GITHUB_SHA:-}
+      VERSION_TAG: ${VERSION_TAG:-}
+      # Astro configuration
+      ASTRO_SITE_URL: ${ASTRO_SITE_URL:-}
+      ASTRO_BASE_PATH: ${ASTRO_BASE_PATH:-}
+      ASTRO_ASSETS_PREFIX: ${ASTRO_ASSETS_PREFIX:-}
+      # Application configuration
+      # Add env vars for your application here.
 
 services:
 
@@ -18,9 +26,10 @@ services:
       target: app_prod
       args:
         PORT: ${DOCS_DOCKER_PORT:-8080}
+        BUILD_CHECK: ${BUILD_CHECK:-true}
         <<: [ *docs_environment ]
     # Deploy
     environment:
       <<: [ *docs_environment ]
     ports:
-      - "${DOCS_PORT:-80}:${DOCS_DOCKER_PORT:-8080}" # HTTP
+      - ${DOCS_PORT:-8080}:${DOCS_DOCKER_PORT:-8080} # HTTP

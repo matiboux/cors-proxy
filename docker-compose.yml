@@ -13,5 +13,4 @@ services:
         PORT: ${APP_DOCKER_PORT:-8080}
     # Deploy
     ports:
-      # HTTP
-      - "${APP_PORT:-80}:${APP_DOCKER_PORT:-8080}"
+      - ${APP_PORT:-8080}:${APP_DOCKER_PORT:-8080} # HTTP

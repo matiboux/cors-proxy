@@ -141,7 +141,7 @@ function copyInputValue(selector: string, event: MouseEvent)
 
 	<!-- Step separator -->
 	<div class="pl-2 text-xl text-gray-600">
-		<span class="icon-[mdi--plus] align-icon-inline"></span>
+		<span class="icon-[mdi--plus] icon-align"></span>
 	</div>
 
 	<!-- Input group -->
@@ -189,7 +189,7 @@ function copyInputValue(selector: string, event: MouseEvent)
 
 	<!-- Convertion separator -->
 	<div class="pl-2 text-xl text-gray-600">
-		<span class="icon-[mdi--arrow-down] align-icon-inline"></span>
+		<span class="icon-[mdi--arrow-down] icon-align"></span>
 	</div>
 
 	<!-- Output group -->
@@ -220,6 +220,8 @@ function copyInputValue(selector: string, event: MouseEvent)
 </div>
 
 <style lang="scss">
+@reference "tailwindcss/theme";
+
 .copy-button {
 	@apply inline-flex items-center gap-1;
 	@apply ml-1 px-2 py-0.5 rounded-full;

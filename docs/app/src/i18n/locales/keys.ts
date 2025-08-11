@@ -1,5 +1,6 @@
-const defaultLocale =
-[
+import type { DefaultLocale } from '~/i18n/types.d.ts'
+
+export const localeKeys = [
 	// Index
 	'Simple CORS proxy server to bypass browser restrictions locally.',
 	'This tool allows you to format the proxy URL pointing to the target service you want to access without CORS restrictions.',
@@ -14,26 +15,14 @@ const defaultLocale =
 	'Copied!',
 	// Footer
 	'Open source project',
-	'See the source code on {0}',
-	'Built with {0}, served by {1}',
-	'Made with love by {0}',
+	'See the source code on',
+	'Built with',
+	'served by',
+	'Made with love by',
 	'Data privacy',
 	'No data is collected or processed over the network or on any server.',
 	'All data is processed locally in your browser, and stays on your own device.',
 	'This website uses no cookies and does no tracking.',
-] as const
+] as const satisfies DefaultLocale
 
-type Keys = typeof defaultLocale[number]
-type Type = { [key in Keys]: key }
-
-// Default locale uses the key as the value
-const locale = defaultLocale
-	.reduce<Type>((acc, key) =>
-		{
-			(acc as any)[key] = key
-			return acc
-		},
-		{} as Type,
-	)
-
-export default locale as Readonly<typeof locale>
+export type DefaultLocaleConst = typeof localeKeys
