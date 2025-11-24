@@ -33,7 +33,7 @@
     "@iconify/tailwind4": "^1.0.6",
     "@nanostores/persistent": "^0.10.2",
     "@tailwindcss/vite": "^4.1.11",
-    "astro": "^5.12.9",
+    "astro": "^5.15.9",
     "nanostores": "^0.11.4",
     "sass": "^1.90.0",
     "svelte": "^5.38.0",
