@@ -36,7 +36,7 @@
     "astro": "^5.15.9",
     "nanostores": "^0.11.4",
     "sass": "^1.90.0",
-    "svelte": "^5.38.0",
+    "svelte": "^5.55.7",
     "tailwindcss": "^4.1.11",
     "typescript": "^5.9.2"
   },
