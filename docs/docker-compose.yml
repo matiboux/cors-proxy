@@ -2,12 +2,12 @@
 
 x-common:
 
-  app-build-context: &app-build-context
+  docs-build-context: &docs-build-context
     # Build context
     context: .
     dockerfile: ./Dockerfile
 
-  app-environment: &app-environment
+  docs-environment: &docs-environment
     # Deployment
     APP_ENV: ${APP_ENV:-prod}
     GITHUB_REPOSITORY_URL: ${GITHUB_REPOSITORY_URL:-}
@@ -22,19 +22,19 @@ x-common:
 
 services:
 
-  app:
+  docs:
     # Build
     image: ${IMAGES_PREFIX:-app}:${IMAGES_TAG:-latest}
     build:
-      <<: [ *app-build-context ]
+      <<: [ *docs-build-context ]
       target: app_prod
       args:
         PORT: ${APP_DOCKER_PORT:-8080}
         BUILD_CHECK: ${BUILD_CHECK:-true}
         NGINX_HOST: ${NGINX_HOST:-localhost}
-        <<: [ *app-environment ]
+        <<: [ *docs-environment ]
     # Deploy
     environment:
-      <<: [ *app-environment ]
+      <<: [ *docs-environment ]
     ports:
-      - ${APP_PORT:-8080}:${APP_DOCKER_PORT:-8080} # HTTP
+      - ${DOCS_PORT:-8080}:${DOCS_DOCKER_PORT:-8080} # HTTP
