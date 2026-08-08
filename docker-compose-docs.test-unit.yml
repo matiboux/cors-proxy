@@ -1,5 +1,12 @@
 # Services overrides for testing
 
+name: cors-proxy-docs-test-unit
+
+x-common:
+
+  app-test-environment: &app-test-environment
+    CI: ${CI:-}
+
 services:
 
   docs:
@@ -10,12 +17,12 @@ services:
     # Build override
     image: ${IMAGES_PREFIX:-app}-docs-test-unit:${IMAGES_TAG:-latest}
     build:
-      target: app_test_unit
+      target: test_unit
       args:
         UID: ${DOCKER_UID:-${UID:-1000}}
     # Deploy override
     user: ${DOCKER_UID:-${UID:-1000}}
     environment:
-      CI: ${CI:-}
+      <<: [ *app-test-environment ]
     tmpfs:
-      - /tmp:mode=1777,uid=${DOCKER_UID:-${UID:-1000}},gid=0
+      - /tmp:mode=1777,exec,uid=${DOCKER_UID:-${UID:-1000}},gid=0

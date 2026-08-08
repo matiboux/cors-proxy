@@ -14,12 +14,17 @@ services:
       - ./docs/dist:/dist
 
   docs:
+    # Extend
+    extends:
+      file: ./docker-compose-docs.yml
+      service: docs
     # Build override
     image: ${IMAGES_PREFIX:-app}-docs-cicd:${IMAGES_TAG:-latest}
     build:
-      target: app_prod_build
+      target: source_prod
       args:
         UID: ${DOCKER_UID:-${UID:-1000}}
+        BUILD_CHECK: ${BUILD_CHECK:-false}
     # Deploy override
     depends_on:
       docs-volumes:

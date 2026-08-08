@@ -1,8 +1,10 @@
 # Services definition for running CLI commands
 
+name: cors-proxy-cli
+
 services:
 
-  docs-volumes:
+  app-volumes:
     # Build
     image: matiboux/chown-volumes:latest
     # Deploy
@@ -11,13 +13,13 @@ services:
       VOLUMES: |
         /app
     volumes:
-      - ./docs/app:/app
+      - ./docs:/app
 
   docs:
     # Extend
     extends:
-      file: ./docker-compose-docs.yml
-      service: docs
+      file: ./docs/docker-compose.yml
+      service: app
     # Build override
     image: ${IMAGES_PREFIX:-app}-docs-cli:${IMAGES_TAG:-latest}
     build:
@@ -33,5 +35,5 @@ services:
     tmpfs:
       - /tmp:mode=1777,exec,uid=${DOCKER_UID:-${UID:-1000}},gid=0
     volumes:
-      - ./docs/app:/app
+      - ./docs:/app
     ports: !reset null

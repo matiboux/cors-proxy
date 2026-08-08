@@ -2,6 +2,14 @@
 
 services:
 
-  app:
+  docs:
+    # Extend
+    extends:
+      file: ./docker-compose-docs.yml
+      service: docs
+    # Build override
+    build:
+      args:
+        BUILD_CHECK: ${BUILD_CHECK:-false}
     # Deploy override
     restart: unless-stopped
