@@ -1,0 +1,21 @@
+@layer theme, base, components, utilities;
+
+/* Tailwind CSS */
+/* You may optionally disable the preflight styles import. */
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+/* Iconify Plugin for Tailwind CSS */
+@plugin "@iconify/tailwind4";
+
+/* Custom theme configuration */
+@theme {
+	/* Custom theme variables */
+	/* Set your custom theme variables below.
+	   See the documentation for more information: https://tailwindcss.com/docs/theme */
+}
+
+/* Tailwind CSS safe list */
+/* You may optionally declare a safelist of classes to always include in the final CSS output. */
+/* Syntax example: `@source inline("{sm:,md,lg:,xl:,}bg-red-{100..900..50}");` */

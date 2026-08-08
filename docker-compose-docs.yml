@@ -1,35 +1,16 @@
 # Services definition for building & deploying
 
-x-common:
-
-  docs:
-    environment: &docs_environment
-      # Deployment configuration
-      GITHUB_REPOSITORY_URL: ${GITHUB_REPOSITORY_URL:-}
-      GITHUB_SHA: ${GITHUB_SHA:-}
-      VERSION_TAG: ${VERSION_TAG:-}
-      # Astro configuration
-      ASTRO_SITE_URL: ${ASTRO_SITE_URL:-}
-      ASTRO_BASE_PATH: ${ASTRO_BASE_PATH:-}
-      ASTRO_ASSETS_PREFIX: ${ASTRO_ASSETS_PREFIX:-}
-      # Application configuration
-      # Add env vars for your application here.
+name: cors-proxy-docs
 
 services:
 
   docs:
-    # Build
+    # Extend
+    extends:
+      file: ./docs/docker-compose.yml
+      service: docs
+    # Build override
     image: ${IMAGES_PREFIX:-app}-docs:${IMAGES_TAG:-latest}
-    build:
-      context: ./docs
-      dockerfile: ./Dockerfile
-      target: app_prod
-      args:
-        PORT: ${DOCS_DOCKER_PORT:-8080}
-        BUILD_CHECK: ${BUILD_CHECK:-true}
-        <<: [ *docs_environment ]
-    # Deploy
-    environment:
-      <<: [ *docs_environment ]
-    ports:
-      - ${DOCS_PORT:-8080}:${DOCS_DOCKER_PORT:-8080} # HTTP
+    # Deploy override
+    ports: !override
+      - ${DOCS_PORT:-8080}:${DOCS_DOCKER_PORT:-8080}  # HTTP

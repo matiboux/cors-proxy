@@ -3,6 +3,10 @@
 services:
 
   docs:
+    # Extend
+    extends:
+      file: ./docker-compose.yml
+      service: docs
     # Build override
     image: ${IMAGES_PREFIX:-app}-docs-dev:${IMAGES_TAG:-latest}
     build:
@@ -18,8 +22,8 @@ services:
           path: ./docs/Dockerfile
         # Application build files
         - action: rebuild
-          path: ./docs/app/pnpm-lock.yaml
+          path: ./docs/pnpm-lock.yaml
         # Application source code
         - action: sync
-          path: ./docs/app
+          path: ./docs
           target: /app
