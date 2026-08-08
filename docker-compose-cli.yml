@@ -4,7 +4,7 @@ name: cors-proxy-cli
 
 services:
 
-  app-volumes:
+  docs-volumes:
     # Build
     image: matiboux/chown-volumes:latest
     # Deploy
@@ -19,7 +19,7 @@ services:
     # Extend
     extends:
       file: ./docs/docker-compose.yml
-      service: app
+      service: docs
     # Build override
     image: ${IMAGES_PREFIX:-app}-docs-cli:${IMAGES_TAG:-latest}
     build:
