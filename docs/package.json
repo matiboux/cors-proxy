@@ -44,5 +44,9 @@
     "@playwright/test": "^1.54.2",
     "@types/node": "^22.17.1",
     "vitest": "^3.2.4"
+  },
+  "imports": {
+    "#global.css": "./src/styles/global.css",
+    "#tailwind.css": "./src/styles/tailwind.css"
   }
 }
